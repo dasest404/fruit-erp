@@ -1,0 +1,1010 @@
+{
+  "user": {
+    "username": "klyiatech",
+    "passwordHash": "8e577d6771e7dbdaac3d2c640edcf4c9f20e2e049403005158a490df826d2b8949feba10cbf83f37d6f5af21a7bd7752ec298e8a9a2eb5faff80f625affd6a5b",
+    "salt": "712b2f49b50ba352a9e13191beeccf52",
+    "mustChangePassword": false,
+    "lastLogin": "2026-09-09T11:53:55.313Z"
+  },
+  "settings": {
+    "businessName": "Hari Kripa Fruit Company",
+    "shortName": "HFC",
+    "tagline": "FRESHNESS • QUALITY • TRUST",
+    "ownerName": "Admin",
+    "phone1": "+91 7566996333",
+    "phone2": "+91 9329599950",
+    "phone2Label": "RJ",
+    "phone3": "+91 9300910015",
+    "phone3Label": "DJ",
+    "phone": "+91 7566996333",
+    "email": "harikripafruitco@gmail.com",
+    "address": "Shop- A/6 Wholesale Fruit Market Camp-2, Power House, Bhilai (C.G.)",
+    "city": "Bhilai",
+    "state": "Chhattisgarh",
+    "pincode": "490011",
+    "gstNumber": "",
+    "currency": "₹",
+    "invoicePrefix": "HFC/2026/",
+    "invoiceTerms": "1. Goods once sold will not be returned unless notified within 4 hours. 2. Subject to Bhilai jurisdiction. 3. Immediate payment required on Mandi Cash Memos.",
+    "whatsappGreeting": "Hello {name}, Greetings from Hari Kripa Fruit Company (HFC)!",
+    "sessionTimeoutMinutes": 60,
+    "logoUrl": "/assets/hfc-logo.svg",
+    "emblemUrl": "/assets/hfc-emblem.svg"
+  },
+  "fruits": [
+    {
+      "id": "f-1",
+      "name": "Kashmiri Apple",
+      "category": "Apples & Pears",
+      "variety": "Royal Delicious",
+      "unit": "KG",
+      "grades": [
+        {
+          "grade": "A",
+          "purchaseRate": 110,
+          "wholesaleRate": 135,
+          "retailRate": 155
+        },
+        {
+          "grade": "B",
+          "purchaseRate": 85,
+          "wholesaleRate": 105,
+          "retailRate": 120
+        },
+        {
+          "grade": "C",
+          "purchaseRate": 55,
+          "wholesaleRate": 70,
+          "retailRate": 85
+        },
+        {
+          "grade": "Damaged",
+          "purchaseRate": 25,
+          "wholesaleRate": 35,
+          "retailRate": 40
+        }
+      ],
+      "minStock": 500,
+      "image": "🍎",
+      "status": "active",
+      "createdAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "f-2",
+      "name": "Nagpur Orange",
+      "category": "Citrus",
+      "variety": "Kinnow Supreme",
+      "unit": "KG",
+      "grades": [
+        {
+          "grade": "A",
+          "purchaseRate": 52,
+          "wholesaleRate": 68,
+          "retailRate": 80
+        },
+        {
+          "grade": "B",
+          "purchaseRate": 38,
+          "wholesaleRate": 50,
+          "retailRate": 62
+        },
+        {
+          "grade": "C",
+          "purchaseRate": 25,
+          "wholesaleRate": 34,
+          "retailRate": 40
+        }
+      ],
+      "minStock": 400,
+      "image": "🍊",
+      "status": "active",
+      "createdAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "f-3",
+      "name": "Robusta Banana",
+      "category": "Bananas",
+      "variety": "Cavendish G9",
+      "unit": "KG",
+      "grades": [
+        {
+          "grade": "A",
+          "purchaseRate": 24,
+          "wholesaleRate": 34,
+          "retailRate": 42
+        },
+        {
+          "grade": "B",
+          "purchaseRate": 18,
+          "wholesaleRate": 26,
+          "retailRate": 32
+        }
+      ],
+      "minStock": 600,
+      "image": "🍌",
+      "status": "active",
+      "createdAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "f-4",
+      "name": "Alphonso Mango",
+      "category": "Mangoes & Tropical",
+      "variety": "Ratnagiri GI",
+      "unit": "Box",
+      "grades": [
+        {
+          "grade": "A",
+          "purchaseRate": 750,
+          "wholesaleRate": 980,
+          "retailRate": 1200
+        },
+        {
+          "grade": "B",
+          "purchaseRate": 520,
+          "wholesaleRate": 680,
+          "retailRate": 850
+        }
+      ],
+      "minStock": 100,
+      "image": "🥭",
+      "status": "active",
+      "createdAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "f-5",
+      "name": "Seedless Green Grapes",
+      "category": "Berries & Grapes",
+      "variety": "Tas-A-Ganesh",
+      "unit": "KG",
+      "grades": [
+        {
+          "grade": "A",
+          "purchaseRate": 65,
+          "wholesaleRate": 85,
+          "retailRate": 105
+        },
+        {
+          "grade": "B",
+          "purchaseRate": 45,
+          "wholesaleRate": 60,
+          "retailRate": 75
+        }
+      ],
+      "minStock": 300,
+      "image": "🍇",
+      "status": "active",
+      "createdAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "f-6",
+      "name": "Kiran Watermelon",
+      "category": "Melons",
+      "variety": "Sugar Baby Dark",
+      "unit": "KG",
+      "grades": [
+        {
+          "grade": "A",
+          "purchaseRate": 14,
+          "wholesaleRate": 22,
+          "retailRate": 30
+        },
+        {
+          "grade": "B",
+          "purchaseRate": 10,
+          "wholesaleRate": 16,
+          "retailRate": 22
+        }
+      ],
+      "minStock": 1000,
+      "image": "🍉",
+      "status": "active",
+      "createdAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "f-7",
+      "name": "Sindhuri Pomegranate",
+      "category": "Exotic & Pome",
+      "variety": "Bhagwa Red",
+      "unit": "KG",
+      "grades": [
+        {
+          "grade": "A",
+          "purchaseRate": 130,
+          "wholesaleRate": 175,
+          "retailRate": 210
+        },
+        {
+          "grade": "B",
+          "purchaseRate": 95,
+          "wholesaleRate": 130,
+          "retailRate": 155
+        }
+      ],
+      "minStock": 250,
+      "image": "🍎",
+      "status": "active",
+      "createdAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "f-8",
+      "name": "Taiwan Red Papaya",
+      "category": "Mangoes & Tropical",
+      "variety": "Taiwan 786",
+      "unit": "KG",
+      "grades": [
+        {
+          "grade": "A",
+          "purchaseRate": 22,
+          "wholesaleRate": 35,
+          "retailRate": 45
+        },
+        {
+          "grade": "B",
+          "purchaseRate": 15,
+          "wholesaleRate": 24,
+          "retailRate": 32
+        }
+      ],
+      "minStock": 400,
+      "image": "🍈",
+      "status": "active",
+      "createdAt": "2026-09-07T10:37:26.444Z"
+    }
+  ],
+  "stock": [
+    {
+      "id": "stk-1",
+      "fruitId": "f-1",
+      "fruitName": "Kashmiri Apple",
+      "variety": "Royal Delicious",
+      "grade": "A",
+      "unit": "KG",
+      "crateQuantity": 5,
+      "weightKg": 85,
+      "purchaseCostPerKg": 110,
+      "averageCostPerKg": 112,
+      "sellingRatePerKg": 135,
+      "stockValue": 9520,
+      "lastUpdated": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "stk-2",
+      "fruitId": "f-1",
+      "fruitName": "Kashmiri Apple",
+      "variety": "Royal Delicious",
+      "grade": "B",
+      "unit": "KG",
+      "crateQuantity": 40,
+      "weightKg": 800,
+      "purchaseCostPerKg": 85,
+      "averageCostPerKg": 87,
+      "sellingRatePerKg": 105,
+      "stockValue": 69600,
+      "lastUpdated": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "stk-3",
+      "fruitId": "f-2",
+      "fruitName": "Nagpur Orange",
+      "variety": "Kinnow Supreme",
+      "grade": "A",
+      "unit": "KG",
+      "crateQuantity": 6,
+      "weightKg": 120,
+      "purchaseCostPerKg": 52,
+      "averageCostPerKg": 54,
+      "sellingRatePerKg": 68,
+      "stockValue": 6480,
+      "lastUpdated": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "stk-4",
+      "fruitId": "f-3",
+      "fruitName": "Robusta Banana",
+      "variety": "Cavendish G9",
+      "grade": "A",
+      "unit": "KG",
+      "crateQuantity": 120,
+      "weightKg": 2400,
+      "purchaseCostPerKg": 24,
+      "averageCostPerKg": 25,
+      "sellingRatePerKg": 34,
+      "stockValue": 60000,
+      "lastUpdated": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "stk-5",
+      "fruitId": "f-4",
+      "fruitName": "Alphonso Mango",
+      "variety": "Ratnagiri GI",
+      "grade": "A",
+      "unit": "Box",
+      "crateQuantity": 85,
+      "weightKg": 425,
+      "purchaseCostPerKg": 750,
+      "averageCostPerKg": 760,
+      "sellingRatePerKg": 980,
+      "stockValue": 64600,
+      "lastUpdated": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "stk-6",
+      "fruitId": "f-5",
+      "fruitName": "Seedless Green Grapes",
+      "variety": "Tas-A-Ganesh",
+      "grade": "A",
+      "unit": "KG",
+      "crateQuantity": 15,
+      "weightKg": 150,
+      "purchaseCostPerKg": 65,
+      "averageCostPerKg": 66,
+      "sellingRatePerKg": 85,
+      "stockValue": 9900,
+      "lastUpdated": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "stk-7",
+      "fruitId": "f-6",
+      "fruitName": "Kiran Watermelon",
+      "variety": "Sugar Baby Dark",
+      "grade": "A",
+      "unit": "KG",
+      "crateQuantity": 140,
+      "weightKg": 3500,
+      "purchaseCostPerKg": 14,
+      "averageCostPerKg": 14.5,
+      "sellingRatePerKg": 22,
+      "stockValue": 50750,
+      "lastUpdated": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "stk-8",
+      "fruitId": "f-7",
+      "fruitName": "Sindhuri Pomegranate",
+      "variety": "Bhagwa Red",
+      "grade": "A",
+      "unit": "KG",
+      "crateQuantity": 30,
+      "weightKg": 600,
+      "purchaseCostPerKg": 130,
+      "averageCostPerKg": 132,
+      "sellingRatePerKg": 175,
+      "stockValue": 79200,
+      "lastUpdated": "2026-09-07T10:37:26.444Z"
+    }
+  ],
+  "suppliers": [
+    {
+      "id": "sup-1",
+      "name": "Kashmir Valley Orchard Farms",
+      "contactPerson": "Ghulam Nabi",
+      "phone": "+91 94190 23456",
+      "address": "Shopian Fruit Complex, Kashmir",
+      "gstNumber": "01AABCK8901D1Z2",
+      "openingBalance": 45000,
+      "notes": "Primary source for Grade A Royal Delicious & Kashmiri Kulu apples",
+      "totalPurchases": 385000,
+      "paymentsMade": 330000,
+      "outstandingPayable": 100000,
+      "createdAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "sup-2",
+      "name": "Nagpur Citrus Agro Federation",
+      "contactPerson": "Rameshwar Patil",
+      "phone": "+91 98230 45678",
+      "address": "Kalamna Mandi Yard, Nagpur, MH",
+      "gstNumber": "27AAACN5432M1ZA",
+      "openingBalance": 20000,
+      "notes": "Direct farmer producer company for Kinnow & Oranges",
+      "totalPurchases": 245000,
+      "paymentsMade": 220000,
+      "outstandingPayable": 45000,
+      "createdAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "sup-3",
+      "name": "Nashik Grape Growers Syndicate",
+      "contactPerson": "Sanjay Shinde",
+      "phone": "+91 98221 87654",
+      "address": "Pimpalgaon Baswant, Nashik, MH",
+      "gstNumber": "27AABCS9876E1Z1",
+      "openingBalance": 15000,
+      "notes": "High quality export and domestic grade seedless table grapes",
+      "totalPurchases": 180000,
+      "paymentsMade": 160000,
+      "outstandingPayable": 35000,
+      "createdAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "sup-4",
+      "name": "Konkan Alphonso Mango Growers",
+      "contactPerson": "Prashant Kelkar",
+      "phone": "+91 94224 11223",
+      "address": "Deogad Road, Ratnagiri, MH",
+      "gstNumber": "27AAGCK7788P1Z9",
+      "openingBalance": 0,
+      "notes": "GI Tagged authentic Devgad & Ratnagiri Alphonso boxes",
+      "totalPurchases": 320000,
+      "paymentsMade": 300000,
+      "outstandingPayable": 20000,
+      "createdAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "sup-5",
+      "name": "Solapur Pomegranate Mandi Traders",
+      "contactPerson": "Balasaheb Jadhav",
+      "phone": "+91 98901 33445",
+      "address": "APMC Market, Sangola, Solapur",
+      "gstNumber": "27AABCS1122K1Z4",
+      "openingBalance": 12000,
+      "notes": "Bhagwa ruby red pomegranates",
+      "totalPurchases": 195000,
+      "paymentsMade": 170000,
+      "outstandingPayable": 37000,
+      "createdAt": "2026-09-07T10:37:26.444Z"
+    }
+  ],
+  "customers": [
+    {
+      "id": "cust-1",
+      "name": "Sharma Fruits",
+      "businessName": "Sharma Fruit Mart & Superstore",
+      "phone": "+91 98201 12345",
+      "address": "Shop No. 12, Station Road, Dadar West",
+      "city": "Mumbai",
+      "gstNumber": "27AABCS4455Q1Z3",
+      "creditLimit": 50000,
+      "openingBalance": 10000,
+      "notes": "Daily buyer of Apples, Oranges, and Bananas. Excellent payment track record.",
+      "totalPurchases": 285000,
+      "totalPayments": 245000,
+      "outstandingBalance": 28450,
+      "lastTransactionDate": "2026-09-06",
+      "createdAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "cust-gupta",
+      "name": "Gupta Fruits",
+      "businessName": "Gupta Fruits & Sons",
+      "phone": "+91 98190 98765",
+      "address": "Shop 14, APMC Market 2",
+      "city": "Navi Mumbai",
+      "creditLimit": 40000,
+      "openingBalance": 0,
+      "totalPurchases": 32800,
+      "totalPayments": 10000,
+      "outstandingBalance": 22800,
+      "lastTransactionDate": "2026-08-29",
+      "createdAt": "2026-08-20T10:00:00.000Z"
+    },
+    {
+      "id": "cust-raj",
+      "name": "Raj Traders",
+      "businessName": "Raj Traders APMC",
+      "phone": "+91 97690 55443",
+      "address": "Gala 55, Fruit Yard",
+      "city": "Mumbai",
+      "creditLimit": 30000,
+      "openingBalance": 0,
+      "totalPurchases": 28200,
+      "totalPayments": 10000,
+      "outstandingBalance": 18200,
+      "lastTransactionDate": "2026-08-31",
+      "createdAt": "2026-08-22T10:00:00.000Z"
+    },
+    {
+      "id": "cust-om",
+      "name": "Om Fresh",
+      "businessName": "Om Fresh Fruit Co",
+      "phone": "+91 98330 77889",
+      "address": "Plot 12, Station Road",
+      "city": "Thane",
+      "creditLimit": 25000,
+      "openingBalance": 0,
+      "totalPurchases": 19500,
+      "totalPayments": 10000,
+      "outstandingBalance": 9500,
+      "lastTransactionDate": "2026-09-02",
+      "createdAt": "2026-08-25T10:00:00.000Z"
+    },
+    {
+      "id": "cust-2",
+      "name": "Royal Supermarket & Groceries",
+      "businessName": "Royal Retail chain Pvt Ltd",
+      "phone": "+91 98190 98765",
+      "address": "Plot 84, Sector 17, Vashi",
+      "city": "Navi Mumbai",
+      "gstNumber": "27AAACR1234F1Z0",
+      "creditLimit": 250000,
+      "openingBalance": 25000,
+      "notes": "Weekly consolidated settlement. Buys Grade A only.",
+      "totalPurchases": 420000,
+      "totalPayments": 360000,
+      "outstandingBalance": 18000,
+      "lastTransactionDate": "2026-09-07",
+      "createdAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "cust-3",
+      "name": "Krishna Retailers",
+      "businessName": "Krishna Fruit Corner",
+      "phone": "+91 97690 55443",
+      "address": "Gandhi Chowk, Kalyan West",
+      "city": "Thane",
+      "gstNumber": "27ABCPK9988D1Z7",
+      "creditLimit": 80000,
+      "openingBalance": 8000,
+      "notes": "Buys Grade B and C fruits for street stalls and local juice centers.",
+      "totalPurchases": 145000,
+      "totalPayments": 125000,
+      "outstandingBalance": 17550,
+      "lastTransactionDate": "2026-09-07",
+      "createdAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "cust-4",
+      "name": "Green Fresh Stores",
+      "businessName": "Green Fresh Hypermarket",
+      "phone": "+91 98330 77889",
+      "address": "Link Road, Andheri West",
+      "city": "Mumbai",
+      "gstNumber": "27AABCG6677H1Z5",
+      "creditLimit": 200000,
+      "openingBalance": 15000,
+      "notes": "High volume buyer for premium mangoes, apples, and exotic fruits.",
+      "totalPurchases": 310000,
+      "totalPayments": 280000,
+      "outstandingBalance": 17000,
+      "lastTransactionDate": "2026-09-07",
+      "createdAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "cust-5",
+      "name": "Star Daily Bazaar",
+      "businessName": "Star Daily Wholesale & Retail",
+      "phone": "+91 98212 33221",
+      "address": "APMC Sector 19, Turbhe",
+      "city": "Navi Mumbai",
+      "gstNumber": "27AAACS8899K1Z6",
+      "creditLimit": 120000,
+      "openingBalance": 5000,
+      "notes": "Strict 7-day payment cycle. Very reliable.",
+      "totalPurchases": 190000,
+      "totalPayments": 175000,
+      "outstandingBalance": 16000,
+      "lastTransactionDate": "2026-09-07",
+      "createdAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "cust-metro",
+      "name": "Metro Fresh Mart",
+      "businessName": "Metro Fresh Daily Needs",
+      "phone": "+91 98223 45678",
+      "city": "Navi Mumbai",
+      "creditLimit": 20000,
+      "openingBalance": 0,
+      "totalPurchases": 20000,
+      "totalPayments": 5000,
+      "outstandingBalance": 15000,
+      "lastTransactionDate": "2026-08-20",
+      "createdAt": "2026-08-05T10:00:00.000Z"
+    },
+    {
+      "id": "cust-city",
+      "name": "City Fruit Plaza",
+      "businessName": "City Fruit Plaza Supermart",
+      "phone": "+91 98212 34567",
+      "city": "Mumbai",
+      "creditLimit": 20000,
+      "openingBalance": 0,
+      "totalPurchases": 18000,
+      "totalPayments": 6000,
+      "outstandingBalance": 12000,
+      "lastTransactionDate": "2026-08-25",
+      "createdAt": "2026-08-10T10:00:00.000Z"
+    },
+    {
+      "id": "cust-apmc",
+      "name": "APMC Daily Retailers",
+      "businessName": "APMC Daily Retailers Stall 9",
+      "phone": "+91 98234 56789",
+      "city": "Navi Mumbai",
+      "creditLimit": 15000,
+      "openingBalance": 0,
+      "totalPurchases": 15000,
+      "totalPayments": 5000,
+      "outstandingBalance": 10000,
+      "lastTransactionDate": "2026-08-15",
+      "createdAt": "2026-08-01T10:00:00.000Z"
+    }
+  ],
+  "purchases": [
+    {
+      "id": "pur-today-1",
+      "purchaseNumber": "PO-2026-086",
+      "purchaseDate": "2026-09-07",
+      "supplierId": "sup-2",
+      "supplierName": "Nagpur Citrus Agro Federation",
+      "fruitId": "f-2",
+      "fruitName": "Nagpur Orange",
+      "variety": "Kinnow Supreme",
+      "grade": "A",
+      "crateQuantity": 30,
+      "grossWeight": 630,
+      "tareWeight": 30,
+      "netWeight": 600,
+      "purchaseRate": 52,
+      "purchaseValue": 31200,
+      "transportCost": 0,
+      "commission": 0,
+      "otherCost": 0,
+      "totalCost": 31200,
+      "effectiveCostPerKg": 52,
+      "paymentStatus": "Paid",
+      "paidAmount": 31200,
+      "dueAmount": 0,
+      "createdAt": "2026-09-07T06:00:00.000Z"
+    }
+  ],
+  "sales": [
+    {
+      "id": "sal-today-1",
+      "invoiceNumber": "KFP/2026/00143",
+      "saleDate": "2026-09-07",
+      "customerId": "cust-2",
+      "customerName": "Royal Supermarket & Groceries",
+      "customerBusiness": "Royal Retail chain Pvt Ltd",
+      "items": [
+        {
+          "id": "item-t1",
+          "fruitId": "f-2",
+          "fruitName": "Nagpur Orange",
+          "variety": "Kinnow Supreme",
+          "grade": "A",
+          "crateQuantity": 20,
+          "weightKg": 400,
+          "ratePerKg": 68,
+          "costPricePerKg": 54,
+          "total": 27200
+        },
+        {
+          "id": "item-t2",
+          "fruitId": "f-3",
+          "fruitName": "Robusta Banana",
+          "variety": "Cavendish G9",
+          "grade": "A",
+          "crateQuantity": 25,
+          "weightKg": 500,
+          "ratePerKg": 34,
+          "costPricePerKg": 25,
+          "total": 17000
+        }
+      ],
+      "subtotal": 44200,
+      "taxAmount": 0,
+      "discountAmount": 0,
+      "grandTotal": 44200,
+      "paymentStatus": "Paid",
+      "paidAmount": 44200,
+      "dueAmount": 0,
+      "paymentMethod": "Bank Transfer",
+      "createdAt": "2026-09-07T08:30:00.000Z"
+    },
+    {
+      "id": "sal-today-2",
+      "invoiceNumber": "KFP/2026/00144",
+      "saleDate": "2026-09-07",
+      "customerId": "cust-3",
+      "customerName": "Krishna Retailers",
+      "customerBusiness": "Krishna Fruit Corner",
+      "items": [
+        {
+          "id": "item-t3",
+          "fruitId": "f-6",
+          "fruitName": "Kiran Watermelon",
+          "variety": "Sugar Baby Dark",
+          "grade": "A",
+          "crateQuantity": 15,
+          "weightKg": 372.7,
+          "ratePerKg": 22,
+          "costPricePerKg": 14.5,
+          "total": 8200
+        }
+      ],
+      "subtotal": 8200,
+      "taxAmount": 0,
+      "discountAmount": 0,
+      "grandTotal": 8200,
+      "paymentStatus": "Paid",
+      "paidAmount": 8200,
+      "dueAmount": 0,
+      "paymentMethod": "Cash",
+      "createdAt": "2026-09-07T09:45:00.000Z"
+    }
+  ],
+  "customerLedger": [
+    {
+      "id": "cl-4",
+      "customerId": "cust-2",
+      "date": "2026-09-07",
+      "type": "Sale",
+      "referenceId": "sal-202",
+      "referenceNo": "KFP/2026/00143",
+      "description": "Sale: Alphonso Mango, Sindhuri Pomegranate",
+      "debit": 54000,
+      "credit": 0,
+      "balance": 85000,
+      "createdAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "cl-sharma-1",
+      "customerId": "cust-1",
+      "date": "2026-08-26",
+      "type": "Sale",
+      "referenceId": "sal-100",
+      "referenceNo": "KFP/2026/00120",
+      "description": "Kashmiri Apple & Papaya",
+      "debit": 29950,
+      "credit": 0,
+      "balance": 29950,
+      "createdAt": "2026-08-26T10:00:00.000Z"
+    },
+    {
+      "id": "cl-sharma-2",
+      "customerId": "cust-1",
+      "date": "2026-09-05",
+      "type": "Payment",
+      "referenceId": "cp-101",
+      "referenceNo": "UPI/3987211",
+      "description": "UPI Payment received via GPay",
+      "debit": 0,
+      "credit": 10000,
+      "balance": 19950,
+      "createdAt": "2026-09-05T14:30:00.000Z"
+    },
+    {
+      "id": "cl-sharma-3",
+      "customerId": "cust-1",
+      "date": "2026-09-06",
+      "type": "Sale",
+      "referenceId": "sal-142",
+      "referenceNo": "KFP/2026/00142",
+      "description": "Kashmiri Apple Grade A (60 KG)",
+      "debit": 8500,
+      "credit": 0,
+      "balance": 28450,
+      "createdAt": "2026-09-06T11:00:00.000Z"
+    }
+  ],
+  "supplierLedger": [
+    {
+      "id": "sl-1",
+      "supplierId": "sup-1",
+      "date": "2026-09-07",
+      "type": "Purchase",
+      "referenceId": "pur-101",
+      "referenceNo": "PO-2026-084",
+      "description": "Purchase of Kashmiri Apple 1,200 KG",
+      "debit": 0,
+      "credit": 143000,
+      "balance": 143000,
+      "createdAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "sl-2",
+      "supplierId": "sup-1",
+      "date": "2026-09-07",
+      "type": "Payment",
+      "referenceId": "sp-1",
+      "referenceNo": "NEFT-SBIN4901",
+      "description": "Bank transfer advance against consignment",
+      "debit": 80000,
+      "credit": 0,
+      "balance": 63000,
+      "createdAt": "2026-09-07T10:37:26.444Z"
+    }
+  ],
+  "supplierPayments": [
+    {
+      "id": "sp-1",
+      "paymentDate": "2026-09-07",
+      "supplierId": "sup-1",
+      "supplierName": "Kashmir Valley Orchard Farms",
+      "amount": 80000,
+      "paymentMethod": "Bank",
+      "referenceNo": "NEFT-SBIN4901",
+      "notes": "Advance part payment for apple truck",
+      "createdAt": "2026-09-07T10:37:26.444Z"
+    }
+  ],
+  "customerPayments": [
+    {
+      "id": "cp-1",
+      "paymentDate": "2026-09-07",
+      "customerId": "cust-1",
+      "customerName": "Sharma Fruit Mart",
+      "amount": 30000,
+      "paymentMethod": "UPI",
+      "referenceNo": "UPI/3987211",
+      "notes": "UPI received via PhonePe QR",
+      "createdAt": "2026-09-07T10:37:26.444Z"
+    }
+  ],
+  "expenses": [
+    {
+      "id": "exp-today-1",
+      "expenseNumber": "EXP-2026-0041",
+      "date": "2026-09-07",
+      "category": "Transport",
+      "amount": 2800,
+      "paymentMethod": "Cash",
+      "recipient": "Ganesh Transport Tempo",
+      "description": "Mandi unloading and APMC yard cartage",
+      "createdAt": "2026-09-07T07:00:00.000Z"
+    },
+    {
+      "id": "exp-today-2",
+      "expenseNumber": "EXP-2026-0042",
+      "date": "2026-09-07",
+      "category": "Labour & Hamali",
+      "amount": 2000,
+      "paymentMethod": "Cash",
+      "recipient": "APMC Mathadi Hamali Union",
+      "description": "Morning crate unloading labour",
+      "createdAt": "2026-09-07T07:30:00.000Z"
+    }
+  ],
+  "dailyRates": [
+    {
+      "id": "dr-1",
+      "date": "2026-09-07",
+      "fruitId": "f-1",
+      "fruitName": "Kashmiri Apple",
+      "variety": "Royal Delicious",
+      "grade": "A",
+      "unit": "KG",
+      "purchaseRate": 110,
+      "wholesaleRate": 135,
+      "retailRate": 155,
+      "updatedAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "dr-2",
+      "date": "2026-09-07",
+      "fruitId": "f-1",
+      "fruitName": "Kashmiri Apple",
+      "variety": "Royal Delicious",
+      "grade": "B",
+      "unit": "KG",
+      "purchaseRate": 85,
+      "wholesaleRate": 105,
+      "retailRate": 120,
+      "updatedAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "dr-3",
+      "date": "2026-09-07",
+      "fruitId": "f-2",
+      "fruitName": "Nagpur Orange",
+      "variety": "Kinnow Supreme",
+      "grade": "A",
+      "unit": "KG",
+      "purchaseRate": 52,
+      "wholesaleRate": 68,
+      "retailRate": 80,
+      "updatedAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "dr-4",
+      "date": "2026-09-07",
+      "fruitId": "f-3",
+      "fruitName": "Robusta Banana",
+      "variety": "Cavendish G9",
+      "grade": "A",
+      "unit": "KG",
+      "purchaseRate": 24,
+      "wholesaleRate": 34,
+      "retailRate": 42,
+      "updatedAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "dr-5",
+      "date": "2026-09-07",
+      "fruitId": "f-4",
+      "fruitName": "Alphonso Mango",
+      "variety": "Ratnagiri GI",
+      "grade": "A",
+      "unit": "Box",
+      "purchaseRate": 750,
+      "wholesaleRate": 980,
+      "retailRate": 1200,
+      "updatedAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "dr-6",
+      "date": "2026-09-07",
+      "fruitId": "f-5",
+      "fruitName": "Seedless Green Grapes",
+      "variety": "Tas-A-Ganesh",
+      "grade": "A",
+      "unit": "KG",
+      "purchaseRate": 65,
+      "wholesaleRate": 85,
+      "retailRate": 105,
+      "updatedAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "dr-7",
+      "date": "2026-09-07",
+      "fruitId": "f-6",
+      "fruitName": "Kiran Watermelon",
+      "variety": "Sugar Baby Dark",
+      "grade": "A",
+      "unit": "KG",
+      "purchaseRate": 14,
+      "wholesaleRate": 22,
+      "retailRate": 30,
+      "updatedAt": "2026-09-07T10:37:26.444Z"
+    },
+    {
+      "id": "dr-8",
+      "date": "2026-09-07",
+      "fruitId": "f-7",
+      "fruitName": "Sindhuri Pomegranate",
+      "variety": "Bhagwa Red",
+      "grade": "A",
+      "unit": "KG",
+      "purchaseRate": 130,
+      "wholesaleRate": 175,
+      "retailRate": 210,
+      "updatedAt": "2026-09-07T10:37:26.444Z"
+    }
+  ],
+  "wastage": [
+    {
+      "id": "w-mango-1",
+      "date": "2026-09-07",
+      "fruitId": "f-4",
+      "fruitName": "Alphonso Mango",
+      "grade": "A",
+      "weightKg": 25,
+      "estimatedCostLoss": 18750,
+      "reason": "Ripening moisture rot and transit bruising",
+      "notes": "Normal threshold 10 KG. Current 25 KG is 18% higher than normal.",
+      "createdAt": "2026-09-07T08:00:00.000Z"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "notif-1",
+      "title": "Low Stock Alert: Seedless Grapes",
+      "message": "Seedless Green Grapes stock is down to 150 KG (threshold: 300 KG). Order fresh crates.",
+      "type": "low_stock",
+      "severity": "warning",
+      "date": "2026-09-07",
+      "read": false,
+      "linkSection": "stock"
+    },
+    {
+      "id": "notif-2",
+      "title": "Overdue Customer Receivable",
+      "message": "Royal Supermarket outstanding balance is ₹85,000 (Approaching credit limit ₹2,50,000).",
+      "type": "overdue_customer",
+      "severity": "info",
+      "date": "2026-09-07",
+      "read": false,
+      "linkSection": "customers"
+    },
+    {
+      "id": "notif-3",
+      "title": "Supplier Payment Balance Due",
+      "message": "Kashmir Valley Orchard Farms has ₹1,00,000 payable balance remaining.",
+      "type": "supplier_due",
+      "severity": "info",
+      "date": "2026-09-07",
+      "read": false,
+      "linkSection": "suppliers"
+    }
+  ]
+}

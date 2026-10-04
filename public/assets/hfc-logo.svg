@@ -1,0 +1,346 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 680" width="100%" height="100%">
+  <defs>
+    <!-- Gold Ring Gradients -->
+    <linearGradient id="goldOuter" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F2D06B" />
+      <stop offset="30%" stop-color="#C89627" />
+      <stop offset="50%" stop-color="#FDF0A6" />
+      <stop offset="70%" stop-color="#BD841A" />
+      <stop offset="100%" stop-color="#8F5E0D" />
+    </linearGradient>
+    <linearGradient id="goldInner" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FDEAA1" />
+      <stop offset="45%" stop-color="#C89627" />
+      <stop offset="75%" stop-color="#E9C158" />
+      <stop offset="100%" stop-color="#9C670D" />
+    </linearGradient>
+
+    <!-- Background Disc Glow -->
+    <radialGradient id="discGlow" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="70%" stop-color="#FFFCF5" />
+      <stop offset="100%" stop-color="#F9F1DC" />
+    </radialGradient>
+
+    <!-- HFC Letter Gradients -->
+    <linearGradient id="letterH" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF4D4D" />
+      <stop offset="25%" stop-color="#E51E1E" />
+      <stop offset="75%" stop-color="#B70E0E" />
+      <stop offset="100%" stop-color="#7A0000" />
+    </linearGradient>
+    <linearGradient id="letterF" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFA439" />
+      <stop offset="25%" stop-color="#F77100" />
+      <stop offset="75%" stop-color="#D94E00" />
+      <stop offset="100%" stop-color="#9C3400" />
+    </linearGradient>
+    <linearGradient id="letterC" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#34A853" />
+      <stop offset="25%" stop-color="#1E7E34" />
+      <stop offset="75%" stop-color="#135824" />
+      <stop offset="100%" stop-color="#083814" />
+    </linearGradient>
+
+    <!-- Leaf Bowl Gradient -->
+    <linearGradient id="leafGrad" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#1A6B29" />
+      <stop offset="25%" stop-color="#2DA83D" />
+      <stop offset="50%" stop-color="#4CD45A" />
+      <stop offset="75%" stop-color="#2DA83D" />
+      <stop offset="100%" stop-color="#1A6B29" />
+    </linearGradient>
+    <linearGradient id="leafBack" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0D4719" />
+      <stop offset="100%" stop-color="#1A6B29" />
+    </linearGradient>
+
+    <!-- Fruit Gradients -->
+    <!-- Red Apple -->
+    <radialGradient id="redApple" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#FF7575" />
+      <stop offset="25%" stop-color="#EE1D24" />
+      <stop offset="70%" stop-color="#A5080E" />
+      <stop offset="100%" stop-color="#5E0004" />
+    </radialGradient>
+    <!-- Green Apple -->
+    <radialGradient id="greenApple" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#B4F557" />
+      <stop offset="35%" stop-color="#77C822" />
+      <stop offset="75%" stop-color="#4D960E" />
+      <stop offset="100%" stop-color="#2B5B03" />
+    </radialGradient>
+    <!-- Orange -->
+    <radialGradient id="orangeFruit" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#FFC04D" />
+      <stop offset="35%" stop-color="#FF7A00" />
+      <stop offset="75%" stop-color="#D95300" />
+      <stop offset="100%" stop-color="#8F3200" />
+    </radialGradient>
+    <!-- Lemon -->
+    <radialGradient id="lemonFruit" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#FFF885" />
+      <stop offset="40%" stop-color="#FED000" />
+      <stop offset="80%" stop-color="#D89E00" />
+      <stop offset="100%" stop-color="#8B6200" />
+    </radialGradient>
+    <!-- Green Grape -->
+    <radialGradient id="greenGrape" cx="35%" cy="30%" r="65%">
+      <stop offset="0%" stop-color="#E2F99C" />
+      <stop offset="45%" stop-color="#9FD639" />
+      <stop offset="80%" stop-color="#6F9E1E" />
+      <stop offset="100%" stop-color="#46660F" />
+    </radialGradient>
+    <!-- Purple Grape -->
+    <radialGradient id="purpleGrape" cx="35%" cy="30%" r="65%">
+      <stop offset="0%" stop-color="#C287FF" />
+      <stop offset="35%" stop-color="#732DB3" />
+      <stop offset="75%" stop-color="#451275" />
+      <stop offset="100%" stop-color="#22043D" />
+    </radialGradient>
+
+    <!-- Drop Shadows -->
+    <filter id="medallionShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#553000" flood-opacity="0.22" />
+    </filter>
+    <filter id="letterShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="#000000" flood-opacity="0.28" />
+    </filter>
+    <filter id="fruitShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#000000" flood-opacity="0.32" />
+    </filter>
+  </defs>
+
+  <!-- ============================================================== -->
+  <!-- MAIN MEDALLION EMBLEM                                          -->
+  <!-- ============================================================== -->
+  <g transform="translate(0, 0)">
+    <!-- Outer Gold Rim -->
+    <circle cx="400" cy="245" r="235" fill="url(#goldOuter)" filter="url(#medallionShadow)" />
+    <!-- Outer Inset Groove -->
+    <circle cx="400" cy="245" r="227" fill="#8C5C0C" />
+    <!-- Secondary Gold Rim -->
+    <circle cx="400" cy="245" r="224" fill="url(#goldInner)" />
+    <!-- Thin Inner Line -->
+    <circle cx="400" cy="245" r="217" fill="#6A4508" opacity="0.6" />
+    <!-- Pure Ivory / Sunburst Disc Surface -->
+    <circle cx="400" cy="245" r="215" fill="url(#discGlow)" />
+
+    <!-- ============================================================== -->
+    <!-- ACRONYM "HFC" (Bold Serif with 3D Depth)                       -->
+    <!-- ============================================================== -->
+    <!-- "H" Letter in Rich Ruby Red -->
+    <g filter="url(#letterShadow)">
+      <path d="M 235 125
+               L 278 125 L 278 132 L 263 133 L 263 175 L 303 175 L 303 133 L 288 132 L 288 125 L 331 125 L 331 132 L 316 133
+               L 316 235 L 331 236 L 331 243 L 288 243 L 288 236 L 303 235 L 303 189 L 263 189 L 263 235 L 278 236 L 278 243
+               L 235 243 L 235 236 L 250 235 L 250 133 L 235 132 Z"
+            fill="url(#letterH)" />
+      <!-- Letter H top highlight -->
+      <path d="M 252 133 L 314 133 L 314 137 L 252 137 Z" fill="#FFA5A5" opacity="0.6" />
+      <path d="M 264 176 L 302 176 L 302 179 L 264 179 Z" fill="#FFA5A5" opacity="0.5" />
+    </g>
+
+    <!-- "F" Letter in Warm Orange -->
+    <g filter="url(#letterShadow)">
+      <path d="M 370 125
+               L 446 125 L 446 148 L 439 148 L 434 136 L 398 136 L 398 174 L 431 174 L 431 184 L 398 184 L 398 235 L 413 236 L 413 243
+               L 370 243 L 370 236 L 385 235 L 385 133 L 370 132 Z"
+            fill="url(#letterF)" />
+      <!-- Letter F highlights -->
+      <path d="M 387 133 L 444 133 L 444 137 L 387 137 Z" fill="#FFE2B8" opacity="0.6" />
+      <path d="M 399 175 L 429 175 L 429 178 L 399 178 Z" fill="#FFE2B8" opacity="0.5" />
+    </g>
+
+    <!-- "C" Letter in Forest Green -->
+    <g filter="url(#letterShadow)">
+      <path d="M 545 136
+               C 538 129 525 123 507 123
+               C 475 123 451 147 451 184
+               C 451 223 476 245 509 245
+               C 529 245 541 237 549 229
+               L 553 234
+               C 543 246 527 252 505 252
+               C 464 252 436 223 436 184
+               C 436 144 466 116 507 116
+               C 529 116 544 123 552 131 Z"
+            fill="url(#letterC)" />
+      <!-- C Top Terminal Finial -->
+      <path d="M 545 136 C 548 141 553 147 554 153 L 542 153 C 540 148 537 143 534 139 Z" fill="url(#letterC)" />
+    </g>
+
+    <!-- ============================================================== -->
+    <!-- FRESH FRUIT BOUNTY BASKET                                      -->
+    <!-- ============================================================== -->
+    <g id="fruitsGroup" filter="url(#fruitShadow)">
+      <!-- 1. Green Grapes Cluster (Left side) -->
+      <g id="greenGrapes">
+        <!-- Stem -->
+        <path d="M 230 248 Q 238 238 248 245" stroke="#5E4318" stroke-width="3" fill="none" stroke-linecap="round" />
+        <!-- Grapes -->
+        <circle cx="218" cy="272" r="16" fill="url(#greenGrape)" />
+        <circle cx="238" cy="258" r="16" fill="url(#greenGrape)" />
+        <circle cx="258" cy="270" r="16" fill="url(#greenGrape)" />
+        <circle cx="230" cy="290" r="16" fill="url(#greenGrape)" />
+        <circle cx="252" cy="292" r="16" fill="url(#greenGrape)" />
+        <circle cx="274" cy="278" r="15" fill="url(#greenGrape)" />
+        <circle cx="242" cy="310" r="15" fill="url(#greenGrape)" />
+        <circle cx="266" cy="308" r="14" fill="url(#greenGrape)" />
+        <circle cx="288" cy="295" r="14" fill="url(#greenGrape)" />
+        <!-- Grape Specular Highlights -->
+        <ellipse cx="214" cy="268" rx="4" ry="2" fill="#FFFFFF" opacity="0.65" transform="rotate(-30 214 268)" />
+        <ellipse cx="234" cy="254" rx="4" ry="2" fill="#FFFFFF" opacity="0.65" transform="rotate(-30 234 254)" />
+        <ellipse cx="226" cy="286" rx="4" ry="2" fill="#FFFFFF" opacity="0.65" transform="rotate(-30 226 286)" />
+        <ellipse cx="248" cy="288" rx="4" ry="2" fill="#FFFFFF" opacity="0.65" transform="rotate(-30 248 288)" />
+      </g>
+
+      <!-- 2. Glossy Red Delicious Apple -->
+      <g id="redAppleGroup">
+        <!-- Stem -->
+        <path d="M 360 258 C 363 248 370 242 376 244" stroke="#42280C" stroke-width="4" stroke-linecap="round" fill="none" />
+        <!-- Apple Body -->
+        <path d="M 358 262
+                 C 342 250 318 258 308 278
+                 C 294 306 302 342 328 358
+                 C 344 368 360 364 366 358
+                 C 372 364 388 368 404 358
+                 C 426 344 434 308 420 278
+                 C 410 258 386 250 370 262
+                 C 366 265 362 265 358 262 Z"
+              fill="url(#redApple)" />
+        <!-- Apple Specular Shine -->
+        <path d="M 322 278 C 314 294 316 320 326 335 C 322 322 320 298 328 284 C 332 278 328 274 322 278 Z"
+              fill="#FFFFFF" opacity="0.55" />
+        <ellipse cx="340" cy="275" rx="14" ry="7" fill="#FFFFFF" opacity="0.45" transform="rotate(-25 340 275)" />
+      </g>
+
+      <!-- 3. Crisp Green Apple -->
+      <g id="greenAppleGroup">
+        <!-- Stem -->
+        <path d="M 436 266 C 438 258 443 253 448 255" stroke="#42280C" stroke-width="3" stroke-linecap="round" fill="none" />
+        <!-- Apple Body -->
+        <path d="M 434 270
+                 C 422 260 404 266 396 282
+                 C 385 304 391 334 411 348
+                 C 424 356 437 353 442 348
+                 C 447 353 460 356 473 348
+                 C 491 336 497 306 486 282
+                 C 478 266 460 260 448 270
+                 C 444 273 438 273 434 270 Z"
+              fill="url(#greenApple)" />
+        <!-- Green Apple Specular Shine -->
+        <ellipse cx="418" cy="285" rx="10" ry="5" fill="#FFFFFF" opacity="0.55" transform="rotate(-25 418 285)" />
+      </g>
+
+      <!-- 4. Purple Concord Grapes Cluster -->
+      <g id="purpleGrapes">
+        <circle cx="488" cy="270" r="14" fill="url(#purpleGrape)" />
+        <circle cx="506" cy="262" r="14" fill="url(#purpleGrape)" />
+        <circle cx="522" cy="272" r="14" fill="url(#purpleGrape)" />
+        <circle cx="496" cy="290" r="14" fill="url(#purpleGrape)" />
+        <circle cx="516" cy="288" r="14" fill="url(#purpleGrape)" />
+        <circle cx="536" cy="284" r="13" fill="url(#purpleGrape)" />
+        <circle cx="508" cy="308" r="13" fill="url(#purpleGrape)" />
+        <circle cx="528" cy="305" r="13" fill="url(#purpleGrape)" />
+        <circle cx="546" cy="298" r="12" fill="url(#purpleGrape)" />
+        <circle cx="518" cy="324" r="12" fill="url(#purpleGrape)" />
+        <circle cx="538" cy="322" r="11" fill="url(#purpleGrape)" />
+        <!-- Purple Highlights -->
+        <ellipse cx="485" cy="266" rx="4" ry="2" fill="#EBD2FF" opacity="0.7" transform="rotate(-30 485 266)" />
+        <ellipse cx="503" cy="258" rx="4" ry="2" fill="#EBD2FF" opacity="0.7" transform="rotate(-30 503 258)" />
+        <ellipse cx="493" cy="286" rx="4" ry="2" fill="#EBD2FF" opacity="0.7" transform="rotate(-30 493 286)" />
+        <ellipse cx="513" cy="284" rx="4" ry="2" fill="#EBD2FF" opacity="0.7" transform="rotate(-30 513 284)" />
+      </g>
+
+      <!-- 5. Ripe Textured Valencia Orange -->
+      <g id="orangeFruitGroup">
+        <!-- Stem & Small Leaf -->
+        <path d="M 565 258 C 564 250 568 245 572 246" stroke="#42280C" stroke-width="3" stroke-linecap="round" fill="none" />
+        <path d="M 570 248 C 580 244 588 248 586 254 C 578 256 572 252 570 248 Z" fill="#2DA83D" />
+        <!-- Orange Sphere -->
+        <circle cx="576" cy="302" r="48" fill="url(#orangeFruit)" />
+        <!-- Orange Specular Highlight & Texture Arc -->
+        <ellipse cx="554" cy="280" rx="14" ry="7" fill="#FFF2D6" opacity="0.55" transform="rotate(-35 554 280)" />
+      </g>
+
+      <!-- 6. Bright Sunny Lemon (Right Edge) -->
+      <g id="lemonFruitGroup">
+        <!-- Lemon oval with pointed apex -->
+        <path d="M 648 296
+                 C 666 280 674 278 680 286
+                 C 676 294 670 312 654 326
+                 C 636 340 608 338 596 322
+                 C 590 312 596 298 610 286
+                 C 624 276 640 282 648 296 Z"
+              fill="url(#lemonFruit)" />
+        <ellipse cx="642" cy="294" rx="12" ry="5" fill="#FFFFFF" opacity="0.6" transform="rotate(-20 642 294)" />
+      </g>
+    </g>
+
+    <!-- ============================================================== -->
+    <!-- GREEN LEAF CRADLE / BOWL (Holding the bounty)                  -->
+    <!-- ============================================================== -->
+    <g id="leafCradle">
+      <!-- Outer/Bottom Shadow Arc -->
+      <path d="M 188 298
+               C 230 380 320 412 400 412
+               C 480 412 570 380 612 298
+               C 564 366 480 398 400 398
+               C 320 398 236 366 188 298 Z"
+            fill="url(#leafBack)" />
+
+      <!-- Main Lush Crescent Leaf -->
+      <path d="M 180 285
+               C 228 368 316 406 400 406
+               C 484 406 572 368 620 285
+               C 568 358 480 388 400 388
+               C 320 388 232 358 180 285 Z"
+            fill="url(#leafGrad)" />
+
+      <!-- Leaf Center Spine Vein & Gloss Line -->
+      <path d="M 198 296
+               C 246 362 322 394 400 394
+               C 478 394 554 362 602 296
+               C 552 354 476 384 400 384
+               C 324 384 248 354 198 296 Z"
+            fill="#8CF896" opacity="0.75" />
+    </g>
+  </g>
+
+  <!-- ============================================================== -->
+  <!-- TYPOGRAPHY SECTION: "Hari Kripa Fruit Company"                 -->
+  <!-- ============================================================== -->
+  <g transform="translate(400, 520)" text-anchor="middle">
+    <!-- Company Name in Classic Elegant Dark Brown Serif -->
+    <text y="0"
+          font-family="'Playfair Display', 'Georgia', 'Times New Roman', serif"
+          font-size="44"
+          font-weight="900"
+          fill="#3E200C"
+          letter-spacing="0.5">
+      Hari Kripa Fruit Company
+    </text>
+
+    <!-- Decorative Divider Line with Diamond -->
+    <g transform="translate(0, 26)">
+      <!-- Left line -->
+      <line x1="-280" y1="0" x2="-22" y2="0" stroke="#9E672B" stroke-width="2.5" stroke-linecap="round" />
+      <circle cx="-280" cy="0" r="5" fill="#9E672B" />
+      <!-- Center Diamond -->
+      <polygon points="0,-9 9,0 0,9 -9,0" fill="#9E672B" />
+      <!-- Right line -->
+      <line x1="22" y1="0" x2="280" y2="0" stroke="#9E672B" stroke-width="2.5" stroke-linecap="round" />
+      <circle cx="280" cy="0" r="5" fill="#9E672B" />
+    </g>
+
+    <!-- Tagline: FRESHNESS • QUALITY • TRUST -->
+    <text y="68"
+          font-family="'Plus Jakarta Sans', 'Arial', sans-serif"
+          font-size="19"
+          font-weight="800"
+          fill="#3E200C"
+          letter-spacing="9">
+      FRESHNESS • QUALITY • TRUST
+    </text>
+  </g>
+</svg>
