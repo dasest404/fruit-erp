@@ -351,6 +351,32 @@ export function generateSupplierStatementPDF(
   }
 }
 
+function getInvoiceCompanyInfo(sale: any, settings: BusinessSettings) {
+  if (sale.companySnapshot) {
+    const snap = sale.companySnapshot;
+    const name = snap.companyName || settings.businessName || DEFAULT_COMPANY_PROFILE.name;
+    const tagline = snap.tradeName || settings.tagline || DEFAULT_COMPANY_PROFILE.tagline;
+    const address = snap.address || settings.address || DEFAULT_COMPANY_PROFILE.address;
+    const phone = snap.phone || settings.phone1 || DEFAULT_COMPANY_PROFILE.phone1;
+    const email = snap.email || settings.email || DEFAULT_COMPANY_PROFILE.email;
+    const gstinPart = snap.gstin ? ` | GSTIN: ${snap.gstin}` : '';
+    const panPart = snap.pan ? ` | PAN: ${snap.pan}` : '';
+    const subtitle = `${address} | Phone: ${phone}${email ? ` | ${email}` : ''}${gstinPart}${panPart}`;
+    const bankDetails = snap.bankDetails || settings.bankDetails || '';
+    const upi = snap.upi || settings.upiId || '';
+    const terms = snap.termsConditions || settings.invoiceTerms || 'Immediate settlement required for mandi wholesale lots.';
+    const authorizedPerson = snap.authorizedPerson || 'Authorized Signatory';
+    return { name, tagline, address, phone, email, subtitle, bankDetails, upi, terms, authorizedPerson };
+  }
+  return {
+    ...getCompanyInfo(settings),
+    bankDetails: settings.bankDetails || '',
+    upi: settings.upiId || '',
+    terms: settings.invoiceTerms || 'Immediate settlement required for mandi wholesale lots.',
+    authorizedPerson: 'Authorized Signatory',
+  };
+}
+
 export function generateInvoicePDF(
   sale: any,
   settings: BusinessSettings,
@@ -365,7 +391,7 @@ export function generateInvoicePDF(
     });
 
     const pageWidth = doc.internal.pageSize.getWidth();
-    const company = getCompanyInfo(settings);
+    const company = getInvoiceCompanyInfo(sale, settings);
 
     // Top Header Banner
     doc.setFillColor(16, 185, 129); // Emerald 600
@@ -526,11 +552,11 @@ export function generateInvoicePDF(
       doc.setFontSize(7);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(100, 116, 139);
-      doc.text(`Terms: ${settings.invoiceTerms || 'All sales are final.'}`, 14, termsY);
-      doc.text('Subject to Bhilai (C.G.) Jurisdiction • Powered by Klyia Technology', 14, termsY + 4);
+      doc.text(`Terms: ${company.terms || 'All sales are final.'}`, 14, termsY);
+      doc.text(`${company.name} • Subject to local Mandi Jurisdiction`, 14, termsY + 4);
 
       doc.setFont('helvetica', 'bold');
-      doc.text('Authorized Signatory', pageWidth - 14, termsY + 4, { align: 'right' });
+      doc.text(company.authorizedPerson || 'Authorized Signatory', pageWidth - 14, termsY + 4, { align: 'right' });
     }
 
     doc.save(`${sale.invoiceNumber}.pdf`);

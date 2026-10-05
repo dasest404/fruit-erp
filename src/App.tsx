@@ -25,13 +25,56 @@ import { WastageView } from './components/views/WastageView';
 import { ReportsView } from './components/views/ReportsView';
 import { SettingsView } from './components/views/SettingsView';
 
-// Helper to read initial navigation from URL or local storage
+// Path to navigation section mapping for direct URL navigation
+const PATH_TO_SECTION_MAP: Record<string, NavigationSection> = {
+  '': 'dashboard',
+  '/': 'dashboard',
+  '/dashboard': 'dashboard',
+  '/customers': 'customers',
+  '/khata': 'customers',
+  '/suppliers': 'suppliers',
+  '/supplier-payments': 'suppliers',
+  '/products': 'fruits',
+  '/fruits': 'fruits',
+  '/fruit-master': 'fruits',
+  '/sales': 'sales',
+  '/billing': 'sales',
+  '/bill': 'sales',
+  '/purchase': 'purchases',
+  '/purchases': 'purchases',
+  '/inventory': 'stock',
+  '/stock': 'stock',
+  '/rates': 'rates',
+  '/daily-rates': 'rates',
+  '/expenses': 'expenses',
+  '/wastage': 'wastage',
+  '/reports': 'reports',
+  '/settings': 'settings',
+};
+
+const SECTION_TO_CANONICAL_PATH: Record<NavigationSection, string> = {
+  dashboard: '/dashboard',
+  sales: '/sales',
+  purchases: '/purchases',
+  stock: '/inventory',
+  customers: '/customers',
+  suppliers: '/suppliers',
+  fruits: '/fruit-master',
+  rates: '/rates',
+  expenses: '/expenses',
+  wastage: '/wastage',
+  reports: '/reports',
+  settings: '/settings',
+};
+
+// Helper to read initial navigation from URL pathname, query, or local storage
 const getInitialNavState = (): {
   section: NavigationSection;
   customerId?: string;
   supplierId?: string;
 } => {
   try {
+    const rawPath = window.location.pathname.toLowerCase().replace(/\/+$/, '') || '/';
     const params = new URLSearchParams(window.location.search);
     const sec = params.get('section') as NavigationSection | null;
     const validSections: NavigationSection[] = [
@@ -48,7 +91,14 @@ const getInitialNavState = (): {
       'reports',
       'settings',
     ];
-    const targetSec = sec && validSections.includes(sec) ? sec : 'dashboard';
+
+    let targetSec: NavigationSection = 'dashboard';
+    if (PATH_TO_SECTION_MAP[rawPath]) {
+      targetSec = PATH_TO_SECTION_MAP[rawPath];
+    } else if (sec && validSections.includes(sec)) {
+      targetSec = sec;
+    }
+
     const cId =
       params.get('customerId') ||
       (targetSec === 'customers' ? localStorage.getItem('fresherp_selected_customer_id') : null) ||
@@ -94,11 +144,11 @@ export default function App() {
     initialNav.supplierId
   );
 
-  // Helper to synchronize URL query parameters and local storage
+  // Helper to synchronize URL query parameters, paths, and local storage
   const updateUrl = (sec: NavigationSection, custId?: string, supId?: string) => {
     try {
+      const canonicalPath = SECTION_TO_CANONICAL_PATH[sec] || `/${sec}`;
       const params = new URLSearchParams();
-      params.set('section', sec);
       if (sec === 'customers' && custId) {
         params.set('customerId', custId);
         localStorage.setItem('fresherp_selected_customer_id', custId);
@@ -111,8 +161,9 @@ export default function App() {
       } else if (sec === 'suppliers') {
         localStorage.removeItem('fresherp_selected_supplier_id');
       }
-      const newUrl = `${window.location.pathname}?${params.toString()}`;
-      window.history.replaceState(null, '', newUrl);
+      const q = params.toString();
+      const newUrl = q ? `${canonicalPath}?${q}` : canonicalPath;
+      window.history.pushState(null, '', newUrl);
     } catch (e) {
       console.error('Failed to sync URL:', e);
     }

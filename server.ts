@@ -1208,9 +1208,97 @@ function loadStore(forceReload = false): ERPDataStore {
     }
   };
 
+  const ensureCompanyProfiles = (store: ERPDataStore) => {
+    if (!store) return;
+    if (!store.companyProfiles || !Array.isArray(store.companyProfiles) || store.companyProfiles.length === 0) {
+      store.companyProfiles = [
+        {
+          id: "comp-1",
+          companyName: "Hari Kripa Fruit Company",
+          tradeName: "HFC",
+          logo: "/assets/hfc-logo.svg",
+          address: "Shop- A/6 Wholesale Fruit Market Camp-2, Power House, Bhilai (C.G.)",
+          gstin: "",
+          pan: "AAAFH1234F",
+          phone: "+91 7566996333",
+          email: "harikripafruitco@gmail.com",
+          website: "https://harikripafresh.com",
+          bankDetails: "State Bank of India • A/C: 38491029482 • IFSC: SBIN0004901 • Branch: Power House Bhilai",
+          upi: "7566996333@upi",
+          termsConditions: "1. Goods once sold will not be taken back.\n2. Interest @ 18% p.a. will be charged if payment is delayed beyond credit terms.\n3. Subject to Bhilai jurisdiction.",
+          signature: "",
+          authorizedPerson: "Rajesh Kumar (Partner)",
+          isActive: true,
+          isDefault: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: "comp-2",
+          companyName: "ABC Fruits & Vegetables",
+          tradeName: "ABC Fresh",
+          logo: "",
+          address: "Gate No. 3, Mandi Yard, Wholesale APMC Market, Raipur (C.G.)",
+          gstin: "22AAAAA0000A1Z5",
+          pan: "ABCDE1234F",
+          phone: "+91 9876543210",
+          email: "billing@abcfruits.com",
+          website: "https://abcfruits.com",
+          bankDetails: "HDFC Bank • A/C: 50200039281928 • IFSC: HDFC0001234",
+          upi: "abcfruits@hdfcbank",
+          termsConditions: "1. Fresh produce subject to standard mandi shrinkage.\n2. Payment terms 7 days.",
+          signature: "",
+          authorizedPerson: "Sunil Sharma (Manager)",
+          isActive: true,
+          isDefault: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      ];
+      saveStore(store);
+    }
+  };
+
+  const ensureFruitMasterFields = (store: ERPDataStore) => {
+    if (!store || !Array.isArray(store.fruits)) return;
+    let changed = false;
+    store.fruits.forEach((f, idx) => {
+      if (!f.code && !f.productCode) {
+        f.code = `FRT-${String(idx + 1).padStart(3, "0")}`;
+        f.productCode = f.code;
+        changed = true;
+      }
+      if (!f.shortName) {
+        f.shortName = f.name.split(" ")[0];
+        changed = true;
+      }
+      if (f.defaultRate === undefined) {
+        f.defaultRate = f.grades?.[0]?.wholesaleRate || 100;
+        changed = true;
+      }
+      if (f.gstRate === undefined) {
+        f.gstRate = 0;
+        changed = true;
+      }
+      if (!f.hsn) {
+        f.hsn = "0808";
+        changed = true;
+      }
+      if (!f.avatarIcon && f.image && !f.image.startsWith("http") && !f.image.startsWith("data:")) {
+        f.avatarIcon = f.image;
+        changed = true;
+      }
+    });
+    if (changed) {
+      saveStore(store);
+    }
+  };
+
   if (storeCache && !forceReload) {
     ensurePin(storeCache);
     ensureHFCBranding(storeCache);
+    ensureCompanyProfiles(storeCache);
+    ensureFruitMasterFields(storeCache);
     return storeCache;
   }
 
@@ -1220,6 +1308,8 @@ function loadStore(forceReload = false): ERPDataStore {
     storeCache = sqliteData;
     ensurePin(storeCache);
     ensureHFCBranding(storeCache);
+    ensureCompanyProfiles(storeCache);
+    ensureFruitMasterFields(storeCache);
     return storeCache;
   }
 
@@ -1549,31 +1639,84 @@ app.post("/api/erp/dashboard-pin/change", requireAuth, (req: Request, res: Respo
   return res.json({ success: true, message: "Dashboard Amount Lock PIN updated successfully." });
 });
 
+// Get all fruits catalog
+app.get("/api/erp/fruits", requireAuth, (req: Request, res: Response) => {
+  const store = loadStore();
+  return res.json({ success: true, fruits: store.fruits || [] });
+});
+
 // Create new fruit
 app.post("/api/erp/fruits", requireAuth, (req: Request, res: Response) => {
-  const { name, category, variety, unit, grades, minStock, minStockAlertKg, image } = req.body;
+  const {
+    name,
+    shortName,
+    code,
+    productCode,
+    category,
+    variety,
+    unit,
+    defaultRate,
+    gstRate,
+    hsn,
+    hsnSac,
+    description,
+    grades,
+    minStock,
+    minStockAlertKg,
+    image,
+    photoUrl,
+    imageUrl,
+    customIconUrl,
+    avatarIcon,
+    defaultIcon,
+    status,
+  } = req.body;
+
   if (!name || !String(name).trim()) {
     return res.status(400).json({ error: "Fruit name is required." });
   }
+
   const store = loadStore();
   const effectiveMinStock = Number(minStockAlertKg !== undefined ? minStockAlertKg : minStock) || 0;
+  const defRate = Number(defaultRate) || (grades && grades[0]?.wholesaleRate ? Number(grades[0].wholesaleRate) : 100);
+  const effectiveCode = (code || productCode || `FRT-${String(store.fruits.length + 1).padStart(3, "0")}`).trim();
+  const effectiveShortName = (shortName || String(name).split(" ")[0]).trim();
+  const resolvedPhoto = photoUrl || imageUrl || (image && (image.startsWith("http") || image.startsWith("data:")) ? image : undefined);
+  const resolvedAvatar = avatarIcon || defaultIcon || (image && !image.startsWith("http") && !image.startsWith("data:") ? image : "🍎");
+
+  const defaultGrades = grades && Array.isArray(grades) && grades.length > 0 ? grades : [
+    { grade: "A" as const, purchaseRate: Math.round(defRate * 0.8), wholesaleRate: defRate, retailRate: Math.round(defRate * 1.2) },
+    { grade: "B" as const, purchaseRate: Math.round(defRate * 0.65), wholesaleRate: Math.round(defRate * 0.85), retailRate: defRate },
+    { grade: "C" as const, purchaseRate: Math.round(defRate * 0.5), wholesaleRate: Math.round(defRate * 0.7), retailRate: Math.round(defRate * 0.85) },
+    { grade: "Damaged" as const, purchaseRate: Math.round(defRate * 0.25), wholesaleRate: Math.round(defRate * 0.35), retailRate: Math.round(defRate * 0.4) },
+  ];
+
   const newFruit = {
     id: `f-${Date.now()}`,
     name: String(name).trim(),
+    shortName: effectiveShortName,
+    code: effectiveCode,
+    productCode: effectiveCode,
     category: category || "Fresh Fruits",
     variety: variety ? String(variety).trim() : "Standard",
     unit: unit ? String(unit).trim() : "KG",
-    grades: grades && Array.isArray(grades) && grades.length > 0 ? grades : [
-      { grade: "A" as const, purchaseRate: 0, wholesaleRate: 0, retailRate: 0 },
-      { grade: "B" as const, purchaseRate: 0, wholesaleRate: 0, retailRate: 0 },
-      { grade: "C" as const, purchaseRate: 0, wholesaleRate: 0, retailRate: 0 },
-      { grade: "Damaged" as const, purchaseRate: 0, wholesaleRate: 0, retailRate: 0 },
-    ],
+    defaultRate: defRate,
+    gstRate: Number(gstRate) || 0,
+    hsn: (hsn || hsnSac || "0808").trim(),
+    hsnSac: (hsn || hsnSac || "0808").trim(),
+    description: description ? String(description).trim() : "",
+    grades: defaultGrades,
     minStock: effectiveMinStock,
     minStockAlertKg: effectiveMinStock,
-    image: image ? String(image).trim() : "🍎",
-    status: "active" as const,
+    image: resolvedPhoto || resolvedAvatar || "🍎",
+    photoUrl: resolvedPhoto || undefined,
+    imageUrl: resolvedPhoto || undefined,
+    customIconUrl: customIconUrl ? String(customIconUrl).trim() : undefined,
+    avatarIcon: resolvedAvatar || "🍎",
+    defaultIcon: resolvedAvatar || "🍎",
+    status: (status === "inactive" ? "inactive" : "active") as "active" | "inactive",
     createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
 
   store.fruits.unshift(newFruit);
@@ -1608,32 +1751,227 @@ app.put("/api/erp/fruits/:id", requireAuth, (req: Request, res: Response) => {
   const index = store.fruits.findIndex((f) => f.id === id);
   if (index === -1) return res.status(404).json({ error: "Fruit not found." });
 
+  const current = store.fruits[index];
   const updatedMinStock =
     req.body.minStockAlertKg !== undefined
       ? Number(req.body.minStockAlertKg)
       : req.body.minStock !== undefined
         ? Number(req.body.minStock)
-        : store.fruits[index].minStock;
+        : current.minStock;
+
+  const defRate = req.body.defaultRate !== undefined ? Number(req.body.defaultRate) : current.defaultRate;
+  const resolvedPhoto = req.body.photoUrl !== undefined ? req.body.photoUrl : (req.body.imageUrl !== undefined ? req.body.imageUrl : current.photoUrl);
+  const resolvedAvatar = req.body.avatarIcon !== undefined ? req.body.avatarIcon : (req.body.defaultIcon !== undefined ? req.body.defaultIcon : current.avatarIcon);
 
   store.fruits[index] = {
-    ...store.fruits[index],
+    ...current,
     ...req.body,
+    shortName: req.body.shortName !== undefined ? req.body.shortName : current.shortName,
+    code: req.body.code !== undefined ? req.body.code : (req.body.productCode !== undefined ? req.body.productCode : current.code),
+    productCode: req.body.code !== undefined ? req.body.code : (req.body.productCode !== undefined ? req.body.productCode : current.code),
+    defaultRate: defRate,
+    gstRate: req.body.gstRate !== undefined ? Number(req.body.gstRate) : current.gstRate,
+    hsn: req.body.hsn !== undefined ? req.body.hsn : (req.body.hsnSac !== undefined ? req.body.hsnSac : current.hsn),
+    hsnSac: req.body.hsn !== undefined ? req.body.hsn : (req.body.hsnSac !== undefined ? req.body.hsnSac : current.hsn),
+    description: req.body.description !== undefined ? req.body.description : current.description,
+    photoUrl: resolvedPhoto || undefined,
+    imageUrl: resolvedPhoto || undefined,
+    customIconUrl: req.body.customIconUrl !== undefined ? req.body.customIconUrl : current.customIconUrl,
+    avatarIcon: resolvedAvatar || current.avatarIcon || "🍎",
+    defaultIcon: resolvedAvatar || current.avatarIcon || "🍎",
+    image: resolvedPhoto || resolvedAvatar || current.image || "🍎",
     minStock: updatedMinStock,
     minStockAlertKg: updatedMinStock,
+    status: req.body.status !== undefined ? req.body.status : current.status,
     id,
+    updatedAt: new Date().toISOString(),
   };
+
+  // Keep stock items fruitName & unit synced
+  store.stock.forEach((st) => {
+    if (st.fruitId === id) {
+      if (req.body.name) st.fruitName = req.body.name;
+      if (req.body.variety) st.variety = req.body.variety;
+      if (req.body.unit) st.unit = req.body.unit;
+    }
+  });
+
   saveStore(store);
   return res.json({ success: true, fruit: store.fruits[index] });
 });
 
-// Delete fruit
+// Delete or Deactivate fruit (Historical data safety)
 app.delete("/api/erp/fruits/:id", requireAuth, (req: Request, res: Response) => {
   const { id } = req.params;
   const store = loadStore();
+  const index = store.fruits.findIndex((f) => f.id === id);
+  if (index === -1) return res.status(404).json({ error: "Fruit not found." });
+
+  // Check if fruit has transactions in sales, purchases or wastage
+  const usedInSales = store.sales.some((s) => s.items && s.items.some((it) => it.fruitId === id));
+  const usedInPurchases = store.purchases.some((p) => p.fruitId === id);
+  const usedInWastage = store.wastage.some((w) => w.fruitId === id);
+  const hasPhysicalStock = store.stock.some((st) => st.fruitId === id && st.weightKg > 0);
+
+  if (usedInSales || usedInPurchases || usedInWastage || hasPhysicalStock) {
+    // Soft deactivation to protect historical transaction data and ledger integrity
+    store.fruits[index].status = "inactive";
+    store.fruits[index].updatedAt = new Date().toISOString();
+    saveStore(store);
+    return res.json({
+      success: true,
+      deactivated: true,
+      message: "Fruit has historical transactions. It has been safely deactivated instead of deleted to protect historical records.",
+      fruit: store.fruits[index],
+    });
+  }
+
+  // Safe to remove if completely unused
   store.fruits = store.fruits.filter((f) => f.id !== id);
   store.stock = store.stock.filter((s) => s.fruitId !== id);
   saveStore(store);
-  return res.json({ success: true });
+  return res.json({ success: true, deleted: true });
+});
+
+// ==========================================
+// COMPANY BILL PROFILES (PART 1 & PART 15)
+// ==========================================
+
+// Get all company profiles
+app.get("/api/erp/company-profiles", requireAuth, (req: Request, res: Response) => {
+  const store = loadStore();
+  return res.json({ success: true, companyProfiles: store.companyProfiles || [] });
+});
+
+// Create new company profile
+app.post("/api/erp/company-profiles", requireAuth, (req: Request, res: Response) => {
+  const {
+    companyName,
+    tradeName,
+    logo,
+    address,
+    gstin,
+    pan,
+    phone,
+    email,
+    website,
+    bankDetails,
+    upi,
+    termsConditions,
+    signature,
+    authorizedPerson,
+    isActive = true,
+    isDefault = false,
+  } = req.body;
+
+  if (!companyName || !String(companyName).trim()) {
+    return res.status(400).json({ error: "Company Name is required." });
+  }
+  if (!phone || !String(phone).trim()) {
+    return res.status(400).json({ error: "Phone number is required." });
+  }
+
+  const store = loadStore();
+  if (!store.companyProfiles) store.companyProfiles = [];
+
+  const shouldBeDefault = Boolean(isDefault) || store.companyProfiles.length === 0;
+
+  if (shouldBeDefault) {
+    store.companyProfiles.forEach((cp) => {
+      cp.isDefault = false;
+    });
+  }
+
+  const newProfile = {
+    id: `comp-${Date.now()}`,
+    companyName: String(companyName).trim(),
+    tradeName: tradeName ? String(tradeName).trim() : undefined,
+    logo: logo ? String(logo).trim() : undefined,
+    address: address ? String(address).trim() : "",
+    gstin: gstin ? String(gstin).trim().toUpperCase() : undefined,
+    pan: pan ? String(pan).trim().toUpperCase() : undefined,
+    phone: String(phone).trim(),
+    email: email ? String(email).trim().toLowerCase() : undefined,
+    website: website ? String(website).trim() : undefined,
+    bankDetails: bankDetails ? String(bankDetails).trim() : undefined,
+    upi: upi ? String(upi).trim() : undefined,
+    termsConditions: termsConditions ? String(termsConditions).trim() : undefined,
+    signature: signature ? String(signature).trim() : undefined,
+    authorizedPerson: authorizedPerson ? String(authorizedPerson).trim() : undefined,
+    isActive: Boolean(isActive),
+    isDefault: shouldBeDefault,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+
+  store.companyProfiles.unshift(newProfile);
+  saveStore(store);
+
+  return res.json({ success: true, companyProfile: newProfile });
+});
+
+// Update company profile
+app.put("/api/erp/company-profiles/:id", requireAuth, (req: Request, res: Response) => {
+  const { id } = req.params;
+  const store = loadStore();
+  if (!store.companyProfiles) store.companyProfiles = [];
+
+  const index = store.companyProfiles.findIndex((cp) => cp.id === id);
+  if (index === -1) {
+    return res.status(404).json({ error: "Company profile not found." });
+  }
+
+  if (req.body.isDefault) {
+    store.companyProfiles.forEach((cp) => {
+      cp.isDefault = false;
+    });
+  }
+
+  const current = store.companyProfiles[index];
+  store.companyProfiles[index] = {
+    ...current,
+    ...req.body,
+    id,
+    updatedAt: new Date().toISOString(),
+  };
+
+  saveStore(store);
+  return res.json({ success: true, companyProfile: store.companyProfiles[index] });
+});
+
+// Delete or Deactivate company profile
+app.delete("/api/erp/company-profiles/:id", requireAuth, (req: Request, res: Response) => {
+  const { id } = req.params;
+  const store = loadStore();
+  if (!store.companyProfiles) store.companyProfiles = [];
+
+  const index = store.companyProfiles.findIndex((cp) => cp.id === id);
+  if (index === -1) {
+    return res.status(404).json({ error: "Company profile not found." });
+  }
+
+  // Check if profile was used in historical sales
+  const usedInSales = store.sales.some((s) => s.companyProfileId === id);
+  if (usedInSales) {
+    // Soft deactivation to protect historical safety
+    store.companyProfiles[index].isActive = false;
+    store.companyProfiles[index].updatedAt = new Date().toISOString();
+    saveStore(store);
+    return res.json({
+      success: true,
+      deactivated: true,
+      message: "Company profile is linked to historical bills. Deactivated safely.",
+    });
+  }
+
+  store.companyProfiles = store.companyProfiles.filter((cp) => cp.id !== id);
+  // Ensure at least one profile remains default if available
+  if (store.companyProfiles.length > 0 && !store.companyProfiles.some((cp) => cp.isDefault)) {
+    store.companyProfiles[0].isDefault = true;
+  }
+
+  saveStore(store);
+  return res.json({ success: true, deleted: true });
 });
 
 // Universal ERP Data Recalculation Engine
@@ -1722,6 +2060,12 @@ function recalculateAllERPData(store: ERPDataStore): void {
     item.stockValue = Number(((item.weightKg) * (item.averageCostPerKg || 0)).toFixed(2));
   }
 }
+
+// Get all purchases
+app.get("/api/erp/purchases", requireAuth, (req: Request, res: Response) => {
+  const store = loadStore();
+  return res.json({ success: true, purchases: store.purchases || [] });
+});
 
 // Create Purchase (auto calculates weights, costs, updates stock & supplier ledger)
 app.post("/api/erp/purchases", requireAuth, (req: Request, res: Response) => {
@@ -2092,6 +2436,12 @@ app.put("/api/erp/purchases/:id", requireAuth, (req: Request, res: Response) => 
   return res.json({ success: true, purchase: store.purchases[index] });
 });
 
+// Get all sales
+app.get("/api/erp/sales", requireAuth, (req: Request, res: Response) => {
+  const store = loadStore();
+  return res.json({ success: true, sales: store.sales || [] });
+});
+
 // Create Sale (Deducts stock, records invoice, updates customer ledger & profit)
 app.post("/api/erp/sales", requireAuth, (req: Request, res: Response) => {
   const {
@@ -2102,10 +2452,37 @@ app.post("/api/erp/sales", requireAuth, (req: Request, res: Response) => {
     paidAmount = 0,
     notes = "",
     saleDate = new Date().toISOString().split("T")[0],
+    companyProfileId,
+    companySnapshot: passedCompanySnapshot,
   } = req.body;
 
   const store = loadStore();
   const now = new Date().toISOString();
+
+  // Resolve Company Profile for invoice snapshot
+  let selectedCompanyProfile = store.companyProfiles?.find((cp) => cp.id === companyProfileId);
+  if (!selectedCompanyProfile && store.companyProfiles && store.companyProfiles.length > 0) {
+    selectedCompanyProfile = store.companyProfiles.find((cp) => cp.isDefault) || store.companyProfiles[0];
+  }
+
+  const finalCompanySnapshot = passedCompanySnapshot || (selectedCompanyProfile ? {
+    id: selectedCompanyProfile.id,
+    companyName: selectedCompanyProfile.companyName,
+    tradeName: selectedCompanyProfile.tradeName,
+    logo: selectedCompanyProfile.logo,
+    address: selectedCompanyProfile.address,
+    gstin: selectedCompanyProfile.gstin,
+    pan: selectedCompanyProfile.pan,
+    phone: selectedCompanyProfile.phone,
+    email: selectedCompanyProfile.email,
+    website: selectedCompanyProfile.website,
+    bankDetails: selectedCompanyProfile.bankDetails,
+    upi: selectedCompanyProfile.upi,
+    termsConditions: selectedCompanyProfile.termsConditions,
+    signature: selectedCompanyProfile.signature,
+    authorizedPerson: selectedCompanyProfile.authorizedPerson,
+    isActive: selectedCompanyProfile.isActive,
+  } : undefined);
 
   // Find existing customer or auto-create new customer if name provided
   let customer = store.customers.find((c) => c.id === customerId);
@@ -2215,10 +2592,19 @@ app.post("/api/erp/sales", requireAuth, (req: Request, res: Response) => {
       }
     }
 
+    const resolvedItemIcon = it.fruitIcon || (fruit?.photoUrl || (fruit as any)?.imageUrl || fruit?.customIconUrl || fruit?.avatarIcon || fruit?.image || "🍎");
+
     processedItems.push({
       id: `si-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
       fruitId: it.fruitId,
       fruitName: fruit ? fruit.name : it.fruitName,
+      fruitCode: it.fruitCode || fruit?.code || fruit?.productCode || "",
+      fruitIcon: resolvedItemIcon,
+      photoUrl: it.photoUrl || fruit?.photoUrl || (fruit as any)?.imageUrl || "",
+      customIconUrl: it.customIconUrl || fruit?.customIconUrl || "",
+      avatarIcon: it.avatarIcon || fruit?.avatarIcon || fruit?.defaultIcon || "",
+      gstRate: it.gstRate !== undefined ? Number(it.gstRate) : (fruit?.gstRate || 0),
+      hsn: it.hsn || it.hsnSac || fruit?.hsn || fruit?.hsnSac || "",
       variety: it.variety || (fruit ? fruit.variety : "Standard"),
       quantity: it.quantity ? String(it.quantity) : `${weight} ${it.unit || 'KG'}`,
       unit: it.unit || (fruit ? fruit.unit : "KG"),
@@ -2254,6 +2640,8 @@ app.post("/api/erp/sales", requireAuth, (req: Request, res: Response) => {
     customerPhone: customer.phone,
     customerBusiness: customer.businessName,
     customerType: customer.type || req.body.customerType || "Wholesale Buyer",
+    companyProfileId: selectedCompanyProfile?.id || companyProfileId,
+    companySnapshot: finalCompanySnapshot,
     items: processedItems,
     subtotal,
     total: subtotal,
@@ -2399,10 +2787,19 @@ app.put("/api/erp/sales/:id", requireAuth, (req: Request, res: Response) => {
       stockRecord.lastUpdated = now;
     }
 
+    const resolvedItemIcon = it.fruitIcon || (fruit?.photoUrl || (fruit as any)?.imageUrl || fruit?.customIconUrl || fruit?.avatarIcon || fruit?.image || "🍎");
+
     processedItems.push({
       id: it.id || `si-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
       fruitId: it.fruitId,
       fruitName: fruit ? fruit.name : it.fruitName,
+      fruitCode: it.fruitCode || fruit?.code || fruit?.productCode || "",
+      fruitIcon: resolvedItemIcon,
+      photoUrl: it.photoUrl || fruit?.photoUrl || (fruit as any)?.imageUrl || "",
+      customIconUrl: it.customIconUrl || fruit?.customIconUrl || "",
+      avatarIcon: it.avatarIcon || fruit?.avatarIcon || fruit?.defaultIcon || "",
+      gstRate: it.gstRate !== undefined ? Number(it.gstRate) : (fruit?.gstRate || 0),
+      hsn: it.hsn || it.hsnSac || fruit?.hsn || fruit?.hsnSac || "",
       variety: it.variety || (fruit ? fruit.variety : "Standard"),
       quantity: it.quantity ? String(it.quantity) : `${weight} ${it.unit || 'KG'}`,
       unit: it.unit || (fruit ? fruit.unit : "KG"),
@@ -2436,6 +2833,8 @@ app.put("/api/erp/sales/:id", requireAuth, (req: Request, res: Response) => {
     customerPhone: customer.phone,
     customerBusiness: customer.businessName,
     customerType: customer.type || req.body.customerType || oldSale.customerType || "Wholesale Buyer",
+    companyProfileId: req.body.companyProfileId !== undefined ? req.body.companyProfileId : oldSale.companyProfileId,
+    companySnapshot: req.body.companySnapshot !== undefined ? req.body.companySnapshot : oldSale.companySnapshot,
     items: processedItems,
     subtotal,
     total: subtotal,
@@ -2542,6 +2941,11 @@ app.put("/api/erp/sales/:id", requireAuth, (req: Request, res: Response) => {
 });
 
 // Customers CRUD & Payment
+app.get("/api/erp/customers", requireAuth, (req: Request, res: Response) => {
+  const store = loadStore();
+  return res.json({ success: true, customers: store.customers || [] });
+});
+
 app.post("/api/erp/customers", requireAuth, (req: Request, res: Response) => {
   const {
     name,
@@ -2789,6 +3193,11 @@ app.put("/api/erp/customer-payments/:id", requireAuth, (req: Request, res: Respo
 });
 
 // Suppliers CRUD & Payment
+app.get("/api/erp/suppliers", requireAuth, (req: Request, res: Response) => {
+  const store = loadStore();
+  return res.json({ success: true, suppliers: store.suppliers || [] });
+});
+
 app.post("/api/erp/suppliers", requireAuth, (req: Request, res: Response) => {
   const { name, contactPerson, phone, address, gstNumber, openingBalance, notes } = req.body;
   if (!name || !phone) {

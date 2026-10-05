@@ -19,6 +19,7 @@ import {
   SupplierPayment,
   CustomerPayment,
   BusinessSettings,
+  CompanyBillProfile,
 } from "../src/types";
 
 // Ensure global __filename and __dirname exist in ESM runtime environments for Emscripten/sql.js
@@ -192,17 +193,49 @@ function createTablesAndIndexes(db: Database) {
       updated_at TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS company_profiles (
+      id TEXT PRIMARY KEY,
+      company_name TEXT NOT NULL,
+      trade_name TEXT,
+      logo TEXT,
+      address TEXT NOT NULL,
+      gstin TEXT,
+      pan TEXT,
+      phone TEXT NOT NULL,
+      email TEXT,
+      website TEXT,
+      bank_details TEXT,
+      upi TEXT,
+      terms_conditions TEXT,
+      signature TEXT,
+      authorized_person TEXT,
+      is_active INTEGER DEFAULT 1,
+      is_default INTEGER DEFAULT 0,
+      created_at TEXT NOT NULL,
+      updated_at TEXT
+    );
+
     CREATE TABLE IF NOT EXISTS fruits (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
+      short_name TEXT,
+      code TEXT,
       category TEXT NOT NULL,
       variety TEXT NOT NULL,
       unit TEXT NOT NULL DEFAULT 'KG',
+      default_rate REAL DEFAULT 0,
+      gst_rate REAL DEFAULT 0,
+      hsn TEXT,
+      description TEXT,
       grades_json TEXT NOT NULL,
       min_stock REAL DEFAULT 0,
       image TEXT,
+      photo_url TEXT,
+      custom_icon_url TEXT,
+      avatar_icon TEXT,
       status TEXT DEFAULT 'active',
-      created_at TEXT NOT NULL
+      created_at TEXT NOT NULL,
+      updated_at TEXT
     );
 
     CREATE TABLE IF NOT EXISTS stock (
@@ -449,6 +482,35 @@ function createTablesAndIndexes(db: Database) {
     // Column already exists or table was just created
   }
 
+  // Ensure fruits table has extended catalog columns
+  const fruitExtraCols = [
+    "short_name TEXT",
+    "code TEXT",
+    "default_rate REAL DEFAULT 0",
+    "gst_rate REAL DEFAULT 0",
+    "hsn TEXT",
+    "description TEXT",
+    "photo_url TEXT",
+    "custom_icon_url TEXT",
+    "avatar_icon TEXT",
+    "updated_at TEXT",
+  ];
+  for (const c of fruitExtraCols) {
+    try {
+      db.run(`ALTER TABLE fruits ADD COLUMN ${c}`);
+    } catch {
+      // Column already exists
+    }
+  }
+
+  // Ensure sales table has company snapshot columns
+  try {
+    db.run("ALTER TABLE sales ADD COLUMN company_profile_id TEXT");
+  } catch {}
+  try {
+    db.run("ALTER TABLE sales ADD COLUMN company_snapshot_json TEXT");
+  } catch {}
+
   // Record initial migration
   const migrationCount = db.exec("SELECT COUNT(*) as count FROM schema_migrations");
   const count = migrationCount[0]?.values[0]?.[0] as number;
@@ -563,6 +625,37 @@ export function syncStoreToSqlite(store: ERPDataStore): void {
       );
     }
 
+    // 2b. Company Profiles
+    if (store.companyProfiles && Array.isArray(store.companyProfiles)) {
+      syncCollectionWithDeletions("company_profiles", store.companyProfiles, (cp) => {
+        sqliteDb!.run(
+          `INSERT OR REPLACE INTO company_profiles (id, company_name, trade_name, logo, address, gstin, pan, phone, email, website, bank_details, upi, terms_conditions, signature, authorized_person, is_active, is_default, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            cp.id,
+            cp.companyName,
+            cp.tradeName || null,
+            cp.logo || null,
+            cp.address,
+            cp.gstin || null,
+            cp.pan || null,
+            cp.phone,
+            cp.email || null,
+            cp.website || null,
+            cp.bankDetails || null,
+            cp.upi || null,
+            cp.termsConditions || null,
+            cp.signature || null,
+            cp.authorizedPerson || null,
+            cp.isActive ? 1 : 0,
+            cp.isDefault ? 1 : 0,
+            cp.createdAt || new Date().toISOString(),
+            cp.updatedAt || new Date().toISOString(),
+          ]
+        );
+      });
+    }
+
     // 3. Customers
     syncCollectionWithDeletions("customers", store.customers, (c) => {
       sqliteDb!.run(
@@ -668,8 +761,8 @@ export function syncStoreToSqlite(store: ERPDataStore): void {
     // 7. Sales
     syncCollectionWithDeletions("sales", store.sales, (s) => {
       sqliteDb!.run(
-        `INSERT OR REPLACE INTO sales (id, invoice_number, sale_date, customer_id, customer_name, customer_phone, customer_business, subtotal, discount, grand_total, payment_method, paid_amount, due_amount, notes, status, items_json, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT OR REPLACE INTO sales (id, invoice_number, sale_date, customer_id, customer_name, customer_phone, customer_business, subtotal, discount, grand_total, payment_method, paid_amount, due_amount, notes, status, items_json, company_profile_id, company_snapshot_json, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           s.id,
           s.invoiceNumber,
@@ -687,6 +780,8 @@ export function syncStoreToSqlite(store: ERPDataStore): void {
           s.notes || null,
           s.status || "Completed",
           JSON.stringify(s.items || []),
+          s.companyProfileId || null,
+          s.companySnapshot ? JSON.stringify(s.companySnapshot) : null,
           s.createdAt || new Date().toISOString(),
         ]
       );
@@ -753,19 +848,29 @@ export function syncStoreToSqlite(store: ERPDataStore): void {
     // 10. Fruits
     syncCollectionWithDeletions("fruits", store.fruits, (f) => {
       sqliteDb!.run(
-        `INSERT OR REPLACE INTO fruits (id, name, category, variety, unit, grades_json, min_stock, image, status, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT OR REPLACE INTO fruits (id, name, short_name, code, category, variety, unit, default_rate, gst_rate, hsn, description, grades_json, min_stock, image, photo_url, custom_icon_url, avatar_icon, status, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           f.id,
           f.name,
+          f.shortName || null,
+          f.code || f.productCode || null,
           f.category,
           f.variety,
           f.unit || "KG",
+          f.defaultRate || 0,
+          f.gstRate || 0,
+          f.hsn || f.hsnSac || null,
+          f.description || null,
           JSON.stringify(f.grades || []),
           f.minStock || 0,
           f.image || null,
+          f.photoUrl || (f as any).imageUrl || null,
+          f.customIconUrl || null,
+          f.avatarIcon || (f as any).defaultIcon || null,
           f.status || "active",
           f.createdAt || new Date().toISOString(),
+          f.updatedAt || new Date().toISOString(),
         ]
       );
     });
@@ -1098,6 +1203,12 @@ export function loadStoreFromSqlite(): ERPDataStore | null {
         } catch {
           items = [];
         }
+        let companySnapshot: any = undefined;
+        if (r.company_snapshot_json) {
+          try {
+            companySnapshot = JSON.parse(r.company_snapshot_json);
+          } catch {}
+        }
         sales.push({
           id: r.id,
           invoiceNumber: r.invoice_number,
@@ -1106,6 +1217,8 @@ export function loadStoreFromSqlite(): ERPDataStore | null {
           customerName: r.customer_name,
           customerPhone: r.customer_phone || "",
           customerBusiness: r.customer_business || undefined,
+          companyProfileId: r.company_profile_id || undefined,
+          companySnapshot,
           items,
           subtotal: r.subtotal || 0,
           discount: r.discount || 0,
@@ -1202,14 +1315,27 @@ export function loadStoreFromSqlite(): ERPDataStore | null {
         fruits.push({
           id: r.id,
           name: r.name,
+          shortName: r.short_name || undefined,
+          code: r.code || undefined,
+          productCode: r.code || undefined,
           category: r.category,
           variety: r.variety,
           unit: r.unit || "KG",
+          defaultRate: Number(r.default_rate) || 0,
+          gstRate: Number(r.gst_rate) || 0,
+          hsn: r.hsn || undefined,
+          hsnSac: r.hsn || undefined,
+          description: r.description || undefined,
           grades,
           minStock: r.min_stock || 0,
+          minStockAlertKg: r.min_stock || 0,
           image: r.image || undefined,
+          photoUrl: r.photo_url || undefined,
+          customIconUrl: r.custom_icon_url || undefined,
+          avatarIcon: r.avatar_icon || undefined,
           status: r.status || "active",
           createdAt: r.created_at,
+          updatedAt: r.updated_at || undefined,
         });
       }
     }
@@ -1359,9 +1485,41 @@ export function loadStoreFromSqlite(): ERPDataStore | null {
       }
     }
 
+    // 15. Company Profiles
+    const compRes = sqliteDb.exec("SELECT * FROM company_profiles ORDER BY is_default DESC, company_name ASC");
+    const companyProfiles: CompanyBillProfile[] = [];
+    if (compRes.length > 0) {
+      const cols = compRes[0].columns;
+      for (const vals of compRes[0].values) {
+        const r = mapRowToObj(cols, vals);
+        companyProfiles.push({
+          id: String(r.id),
+          companyName: String(r.company_name),
+          tradeName: r.trade_name ? String(r.trade_name) : undefined,
+          logo: r.logo ? String(r.logo) : undefined,
+          address: String(r.address),
+          gstin: r.gstin ? String(r.gstin) : undefined,
+          pan: r.pan ? String(r.pan) : undefined,
+          phone: String(r.phone),
+          email: r.email ? String(r.email) : undefined,
+          website: r.website ? String(r.website) : undefined,
+          bankDetails: r.bank_details ? String(r.bank_details) : undefined,
+          upi: r.upi ? String(r.upi) : undefined,
+          termsConditions: r.terms_conditions ? String(r.terms_conditions) : undefined,
+          signature: r.signature ? String(r.signature) : undefined,
+          authorizedPerson: r.authorized_person ? String(r.authorized_person) : undefined,
+          isActive: Boolean(r.is_active === 1 || r.is_active === true),
+          isDefault: Boolean(r.is_default === 1 || r.is_default === true),
+          createdAt: String(r.created_at || new Date().toISOString()),
+          updatedAt: r.updated_at ? String(r.updated_at) : undefined,
+        });
+      }
+    }
+
     return {
       user,
       settings,
+      companyProfiles,
       fruits,
       stock,
       suppliers,

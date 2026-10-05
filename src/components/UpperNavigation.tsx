@@ -172,10 +172,10 @@ export const UpperNavigation: React.FC<UpperNavigationProps> = ({
         },
         {
           id: 'fruit-master',
-          label: 'Fruit Master & Grades',
+          label: 'Fruit Master Catalog',
           icon: <Apple className="w-3.5 h-3.5 text-rose-500" />,
           action: () => onNavigate('fruits'),
-          description: 'Fruit varieties & grade A/B/C rates',
+          description: 'Fruit varieties, photo icons & default rates',
         },
         {
           id: 'daily-rates',
@@ -253,10 +253,17 @@ export const UpperNavigation: React.FC<UpperNavigationProps> = ({
         },
         {
           id: 'fruits-catalog',
-          label: 'Fruit Products & Categories',
+          label: 'Fruit Master Catalog',
           icon: <Apple className="w-3.5 h-3.5 text-rose-500" />,
           action: () => onNavigate('fruits'),
-          description: 'Categories, packaging units & min stock',
+          description: 'Central product master, photo icons & pricing',
+        },
+        {
+          id: 'company-profiles',
+          label: 'Company Bill Profiles',
+          icon: <Building className="w-3.5 h-3.5 text-amber-600" />,
+          action: () => onNavigate('settings'),
+          description: 'Multi-company profiles, logos, GST & bank details',
         },
       ],
     },

@@ -82,19 +82,55 @@ export interface FruitGradeRate {
 
 export type FruitGradePrice = FruitGradeRate;
 
+export interface CompanyBillProfile {
+  id: string;
+  companyName: string;
+  tradeName?: string;
+  logo?: string;
+  address: string;
+  gstin?: string;
+  pan?: string;
+  phone: string;
+  email?: string;
+  website?: string;
+  bankDetails?: string;
+  upi?: string;
+  termsConditions?: string;
+  signature?: string;
+  authorizedPerson?: string;
+  isActive: boolean;
+  isDefault?: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export interface FruitItem {
   id: string;
   name: string;
+  shortName?: string;
+  productCode?: string;
+  code?: string;
   category: string;
   variety: string;
   unit: UnitType;
+  defaultRate?: number;
+  gstRate?: number;
+  hsnSac?: string;
+  hsn?: string;
+  description?: string;
   grades: FruitGradeRate[];
   minStock: number;
   minStockAlertKg?: number;
   supplierId?: string;
   image?: string;
+  photoUrl?: string;
+  imageUrl?: string;
+  customIconUrl?: string;
+  avatarIcon?: string;
+  defaultIcon?: string;
   status: 'active' | 'inactive';
   createdAt: string;
+  updatedAt?: string;
 }
 
 export type Fruit = FruitItem;
@@ -207,6 +243,11 @@ export interface SaleItem {
   id: string;
   fruitId: string;
   fruitName: string;
+  fruitCode?: string;
+  fruitIcon?: string;
+  photoUrl?: string;
+  customIconUrl?: string;
+  avatarIcon?: string;
   variety?: string;
   grade?: FruitGradeType | string;
   unit?: UnitType | string;
@@ -220,6 +261,8 @@ export interface SaleItem {
   totalPrice?: number;
   amount?: number;
   costPricePerKg?: number;
+  gstRate?: number;
+  hsn?: string;
 }
 
 export interface Sale {
@@ -231,6 +274,8 @@ export interface Sale {
   customerPhone?: string;
   customerBusiness?: string;
   customerType?: string;
+  companyProfileId?: string;
+  companySnapshot?: CompanyBillProfile;
   items: SaleItem[];
   subtotal: number;
   total?: number;
@@ -459,6 +504,7 @@ export interface ERPDataStore {
     dashboardPinSalt?: string;
   };
   settings: BusinessSettings;
+  companyProfiles?: CompanyBillProfile[];
   fruits: FruitItem[];
   stock: StockRecord[];
   suppliers: Supplier[];

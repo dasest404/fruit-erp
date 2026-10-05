@@ -17,11 +17,15 @@ import {
   Wallet,
   ChevronDown,
   Sparkles,
+  Building,
 } from 'lucide-react';
-import { ERPDataStore, Sale, SaleItem, Customer } from '../../types';
+import { ERPDataStore, Sale, SaleItem, Customer, CompanyBillProfile, Fruit } from '../../types';
 import { formatINR, formatCurrencyAmount, formatDate, downloadCSV, buildWhatsAppLink } from '../../utils/formatters';
 import { api } from '../../services/api';
 import { CustomerAvatar } from '../CustomerAvatar';
+import { FruitAvatar } from '../FruitAvatar';
+import { CompanyBillProfileModal } from '../CompanyBillProfileModal';
+import { QuickAddFruitModal } from '../QuickAddFruitModal';
 
 interface SalesViewProps {
   data: ERPDataStore;
@@ -40,6 +44,51 @@ export const SalesView: React.FC<SalesViewProps> = ({
   const [editingSale, setEditingSale] = useState<Sale | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'paid' | 'partial' | 'credit'>('all');
+
+  // Company Bill Profiles (Part A)
+  const companyProfiles = useMemo(() => {
+    if (data.companyProfiles && data.companyProfiles.length > 0) {
+      return data.companyProfiles.filter((cp) => cp.isActive !== false);
+    }
+    return [
+      {
+        id: 'comp-1',
+        companyName: data.settings?.businessName || 'Hari Kripa Fruit Company',
+        tradeName: data.settings?.shortName || 'HFC',
+        logo: data.settings?.logoUrl || '/assets/hfc-logo.svg',
+        address: data.settings?.address || 'Shop- A/6 Wholesale Fruit Market Camp-2, Power House, Bhilai (C.G.)',
+        phone: data.settings?.phone1 || data.settings?.phone || '+91 7566996333',
+        email: data.settings?.email || 'harikripafruitco@gmail.com',
+        website: 'www.harikripafruit.com',
+        gstin: data.settings?.gstNumber || data.settings?.gstin || '',
+        pan: 'AAAFH1234F',
+        bankDetails: data.settings?.bankDetails || '',
+        upi: data.settings?.upiId || '',
+        termsConditions: data.settings?.invoiceTerms || '',
+        signature: '',
+        authorizedPerson: 'Rajesh Patel (Proprietor)',
+        isDefault: true,
+        isActive: true,
+      } as CompanyBillProfile,
+    ];
+  }, [data.companyProfiles, data.settings]);
+
+  const defaultCompanyProfileId = useMemo(() => {
+    const def = companyProfiles.find((cp) => cp.isDefault) || companyProfiles[0];
+    return def ? def.id : 'comp-1';
+  }, [companyProfiles]);
+
+  const [selectedCompanyProfileId, setSelectedCompanyProfileId] = useState<string>(defaultCompanyProfileId);
+  const [isAddCompanyModalOpen, setIsAddCompanyModalOpen] = useState(false);
+  const [isQuickAddFruitModalOpen, setIsQuickAddFruitModalOpen] = useState(false);
+
+  const selectedCompany = useMemo(() => {
+    return (
+      companyProfiles.find((cp) => cp.id === selectedCompanyProfileId) ||
+      companyProfiles.find((cp) => cp.isDefault) ||
+      companyProfiles[0]
+    );
+  }, [companyProfiles, selectedCompanyProfileId]);
 
   React.useEffect(() => {
     if (initialCreateModalOpen) {
@@ -127,14 +176,19 @@ export const SalesView: React.FC<SalesViewProps> = ({
     return 1;
   };
 
-  // Matching products from Fruit/Product Master
+  // Matching products from Fruit/Product Master with Smart Search (PART G)
+  // Searches fruit name, short name, product code, category & variety
   const matchingProducts = useMemo(() => {
     if (!productSearchTerm.trim()) return data.fruits;
     const term = productSearchTerm.trim().toLowerCase();
-    return data.fruits.filter((f) =>
-      f.name.toLowerCase().includes(term) ||
-      (f.variety && f.variety.toLowerCase().includes(term))
-    );
+    return data.fruits.filter((f) => {
+      const nameMatch = (f.name || '').toLowerCase().includes(term);
+      const shortMatch = (f.shortName || '').toLowerCase().includes(term);
+      const codeMatch = (f.code || f.productCode || '').toLowerCase().includes(term);
+      const catMatch = (f.category || '').toLowerCase().includes(term);
+      const varMatch = (f.variety || '').toLowerCase().includes(term);
+      return nameMatch || shortMatch || codeMatch || catMatch || varMatch;
+    });
   }, [productSearchTerm, data.fruits]);
 
   // When an existing product is selected from smart suggestions
@@ -156,16 +210,45 @@ export const SalesView: React.FC<SalesViewProps> = ({
     setBaseUnitKg(unitKg);
     setCurrentKg(String(Math.round(parsedQty * unitKg)));
 
-    // Auto-fill Rate from dailyRates or catalog
+    // Auto-fill Rate from fruit.defaultRate, dailyRates, or fruit grades
     const dailyRateObj = data.dailyRates.find(
       (dr) => dr.fruitId === fruit.id && dr.date === saleDate
     );
     if (dailyRateObj && dailyRateObj.wholesaleRate > 0) {
       setCurrentRate(dailyRateObj.wholesaleRate);
+    } else if (fruit.defaultRate !== undefined && fruit.defaultRate !== null) {
+      setCurrentRate(fruit.defaultRate);
     } else {
       const primaryRate = fruit.grades?.[0]?.wholesaleRate || 80;
       setCurrentRate(primaryRate);
     }
+    setErrorMessage('');
+  };
+
+  // When a brand new fruit is created via QuickAddFruitModal while on this bill
+  const handleFruitCreated = (newFruit: Fruit) => {
+    setSelectedProductId(newFruit.id);
+    setProductSearchTerm(newFruit.name);
+
+    const fruitUnit = (newFruit.unit || 'KG').trim();
+    setCurrentUnit(fruitUnit);
+
+    const qty = currentQuantity.trim() || '1';
+    setCurrentQuantity(qty);
+    const parsedQty = parseQuantityNumber(qty);
+
+    const isKgUnit = fruitUnit.toUpperCase() === 'KG';
+    const unitKg = isKgUnit ? 1 : 20;
+    setBaseUnitKg(unitKg);
+    setCurrentKg(String(Math.round(parsedQty * unitKg)));
+
+    const rateVal =
+      newFruit.defaultRate !== undefined && newFruit.defaultRate !== null
+        ? Number(newFruit.defaultRate)
+        : newFruit.grades?.[0]?.wholesaleRate || 100;
+    setCurrentRate(rateVal);
+
+    setIsProductDropdownOpen(false);
     setErrorMessage('');
   };
 
@@ -334,11 +417,13 @@ export const SalesView: React.FC<SalesViewProps> = ({
     setPaymentMethod('Cash');
     setNotes('');
     setErrorMessage('');
+    setSelectedCompanyProfileId(defaultCompanyProfileId);
     setIsNewSaleOpen(true);
   };
 
   const handleOpenEditSale = (sale: Sale) => {
     setEditingSale(sale);
+    setSelectedCompanyProfileId(sale.companyProfileId || sale.companySnapshot?.id || defaultCompanyProfileId);
     setSelectedCustomerId(sale.customerId);
     setCustomerSearchTerm(sale.customerName || '');
     setIsCustomerDropdownOpen(false);
@@ -500,6 +585,27 @@ export const SalesView: React.FC<SalesViewProps> = ({
         customerName: effectiveCustomerName,
         customerBusiness: effectiveCustomerName,
         customerType: targetCustomer?.type || 'Wholesale Buyer',
+        companyProfileId: selectedCompany?.id || selectedCompanyProfileId,
+        companySnapshot: selectedCompany
+          ? {
+              id: selectedCompany.id,
+              companyName: selectedCompany.companyName,
+              tradeName: selectedCompany.tradeName,
+              logo: selectedCompany.logo,
+              address: selectedCompany.address,
+              gstin: selectedCompany.gstin,
+              pan: selectedCompany.pan,
+              phone: selectedCompany.phone,
+              email: selectedCompany.email,
+              website: selectedCompany.website,
+              bankDetails: selectedCompany.bankDetails,
+              upi: selectedCompany.upi,
+              termsConditions: selectedCompany.termsConditions,
+              signature: selectedCompany.signature,
+              authorizedPerson: selectedCompany.authorizedPerson,
+              isActive: selectedCompany.isActive,
+            }
+          : undefined,
         saleDate,
         items: resolvedItems,
         total,
@@ -773,6 +879,53 @@ export const SalesView: React.FC<SalesViewProps> = ({
                   <span>{errorMessage}</span>
                 </div>
               )}
+
+              {/* PART A: Bill From / Company Selection */}
+              <div className="bg-slate-50 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Building className="w-4 h-4 text-emerald-600" />
+                    <label htmlFor="sales-company-select" className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">
+                      Bill From / Company *
+                    </label>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsAddCompanyModalOpen(true)}
+                    className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 hover:text-emerald-700 hover:underline cursor-pointer transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>+ Add New Company</span>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+                  <div className="md:col-span-8">
+                    <select
+                      id="sales-company-select"
+                      value={selectedCompanyProfileId}
+                      onChange={(e) => setSelectedCompanyProfileId(e.target.value)}
+                      className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer shadow-2xs"
+                    >
+                      {companyProfiles.map((cp) => (
+                        <option key={cp.id} value={cp.id}>
+                          {cp.companyName} {cp.tradeName ? `(${cp.tradeName})` : ''} {cp.isDefault ? '★ (Default)' : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="md:col-span-4 text-[11px] text-slate-500 bg-white px-3 py-2 rounded-xl border border-slate-200 truncate">
+                    {selectedCompany ? (
+                      <span title={`${selectedCompany.address} • Ph: ${selectedCompany.phone}`}>
+                        📍 {selectedCompany.address ? selectedCompany.address.split(',')[0] : 'Mandi'} • 📞 {selectedCompany.phone}
+                      </span>
+                    ) : (
+                      <span>No company profile selected</span>
+                    )}
+                  </div>
+                </div>
+              </div>
 
               {/* Top Row: Customer Selector (Smart Searchable) & Invoice Date */}
               <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
@@ -1060,15 +1213,26 @@ export const SalesView: React.FC<SalesViewProps> = ({
 
                     {/* Responsive Billing Form Row: Product | Quantity | Unit | Rate (₹) | Amount */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end">
-                      {/* 1. Product (Smart Search Input) */}
+                      {/* 1. Product (Smart Search Input with + Add New Fruit) */}
                       <div className="col-span-12 md:col-span-4 relative">
-                        <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                          Product *
-                        </label>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+                            Product *
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => setIsQuickAddFruitModalOpen(true)}
+                            className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 hover:text-emerald-700 hover:underline cursor-pointer transition-colors"
+                            title="Add a new fruit to catalog without leaving bill"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                            <span>+ Add New Fruit</span>
+                          </button>
+                        </div>
                         <div className="relative">
                           <input
                             type="text"
-                            placeholder="Type product (e.g. American Box, Apple)..."
+                            placeholder="🔍 Search Fruit/Product................"
                             value={productSearchTerm}
                             onChange={(e) => {
                               setProductSearchTerm(e.target.value);
@@ -1088,53 +1252,97 @@ export const SalesView: React.FC<SalesViewProps> = ({
                           <Search className="w-4 h-4 text-slate-400 absolute right-3 top-3 pointer-events-none" />
                         </div>
 
-                        {/* Product Autocomplete Dropdown */}
+                        {/* Product Autocomplete Dropdown with Fruit Avatars & + Add Fruit Button */}
                         {isProductDropdownOpen && productSearchTerm.trim().length > 0 && (
-                          <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 overflow-hidden max-h-52 overflow-y-auto">
+                          <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
                             {matchingProducts.length > 0 ? (
                               <div>
-                                <div className="px-3 py-1.5 bg-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                                  Matching Products ({matchingProducts.length})
+                                <div className="px-3 py-1.5 bg-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center justify-between">
+                                  <span>Fruit Results ({matchingProducts.length})</span>
+                                  <span className="text-[9px] text-emerald-600 font-medium">Click to select</span>
                                 </div>
-                                {matchingProducts.map((fruit) => (
-                                  <div
-                                    key={fruit.id}
-                                    onMouseDown={(e) => {
-                                      e.preventDefault();
-                                      handleSelectProduct(fruit);
-                                    }}
-                                    className="px-3 py-2 hover:bg-emerald-50 cursor-pointer border-b border-slate-100 last:border-0 transition-colors"
-                                  >
-                                    <div className="flex items-center justify-between">
-                                      <span className="text-xs font-bold text-slate-900">
-                                        {fruit.image || '🍎'} {fruit.name}
-                                      </span>
-                                      <span className="text-[11px] text-emerald-700 font-semibold font-mono">
-                                        ₹{fruit.grades?.[0]?.wholesaleRate || 80}/KG
-                                      </span>
+                                {matchingProducts.map((fruit) => {
+                                  const displayRate =
+                                    fruit.defaultRate !== undefined && fruit.defaultRate !== null
+                                      ? fruit.defaultRate
+                                      : fruit.grades?.[0]?.wholesaleRate || 80;
+                                  return (
+                                    <div
+                                      key={fruit.id}
+                                      onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        handleSelectProduct(fruit);
+                                      }}
+                                      className="px-3 py-2 hover:bg-emerald-50 cursor-pointer border-b border-slate-100 last:border-0 transition-colors"
+                                    >
+                                      <div className="flex items-center justify-between gap-2">
+                                        <div className="flex items-center gap-2 min-w-0">
+                                          <FruitAvatar fruit={fruit} size="xs" shape="square" />
+                                          <div className="min-w-0">
+                                            <div className="flex items-center gap-1.5 flex-wrap">
+                                              <span className="text-xs font-bold text-slate-900 truncate">
+                                                {fruit.name}
+                                              </span>
+                                              {fruit.code && (
+                                                <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-slate-100 text-slate-600">
+                                                  {fruit.code}
+                                                </span>
+                                              )}
+                                            </div>
+                                            <div className="text-[10px] text-slate-400 truncate">
+                                              {fruit.category} • {fruit.unit || 'KG'}
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div className="text-right shrink-0">
+                                          <span className="text-xs font-bold text-emerald-700 font-mono">
+                                            ₹{displayRate}
+                                          </span>
+                                          <span className="text-[10px] text-slate-400">/{fruit.unit || 'KG'}</span>
+                                        </div>
+                                      </div>
                                     </div>
-                                    <div className="text-[10px] text-slate-400">
-                                      Variety: {fruit.variety || 'Standard'} • Unit: {fruit.unit || 'KG'}
-                                    </div>
-                                  </div>
-                                ))}
+                                  );
+                                })}
                               </div>
                             ) : (
                               <div className="p-3 text-center text-xs text-slate-500">
-                                <span className="font-semibold text-slate-700">"{productSearchTerm}"</span> not found in catalog.
-                                <div className="text-[11px] text-emerald-600 mt-0.5">
-                                  ✓ Will be added as a new product on Cash Memo save.
-                                </div>
+                                <span className="font-semibold text-slate-700">"{productSearchTerm}"</span> not found in Fruit Master.
                               </div>
                             )}
+
+                            {/* Dropdown Quick Add Fruit Action */}
+                            <div
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                setIsQuickAddFruitModalOpen(true);
+                              }}
+                              className="p-2.5 bg-emerald-50/80 hover:bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center justify-between border-t border-emerald-100 cursor-pointer transition-colors"
+                            >
+                              <span className="flex items-center gap-1.5">
+                                <Plus className="w-3.5 h-3.5 text-emerald-600" />
+                                <span>+ Add New Fruit "{productSearchTerm}"</span>
+                              </span>
+                              <span className="text-[9px] bg-white px-1.5 py-0.5 rounded text-emerald-700 shadow-2xs font-semibold">
+                                Quick Modal
+                              </span>
+                            </div>
                           </div>
                         )}
 
                         {/* Direct Indicator for New Product Name */}
                         {productSearchTerm.trim().length > 0 && !selectedProductId && (
-                          <div className="mt-1 flex items-center gap-1 text-[10px] text-emerald-700 font-medium">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
-                            <span>New Product: <strong>{productSearchTerm}</strong> (will be added to Master on save)</span>
+                          <div className="mt-1 flex items-center justify-between text-[10px]">
+                            <span className="text-emerald-700 font-medium">
+                              New Fruit: <strong>{productSearchTerm}</strong>
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setIsQuickAddFruitModalOpen(true)}
+                              className="text-emerald-600 font-bold hover:underline cursor-pointer"
+                            >
+                              + Set Details &amp; Icon
+                            </button>
                           </div>
                         )}
                       </div>
@@ -1266,7 +1474,22 @@ export const SalesView: React.FC<SalesViewProps> = ({
                             {items.map((item, idx) => (
                               <tr key={idx} className="hover:bg-slate-50/60">
                                 <td className="p-2.5 font-mono text-slate-400">{idx + 1}</td>
-                                <td className="p-2.5 font-bold text-slate-900">{item.productName}</td>
+                                <td className="p-2.5 font-bold text-slate-900">
+                                  {(() => {
+                                    const matchedFruit =
+                                      data.fruits.find(
+                                        (f) =>
+                                          f.id === item.fruitId ||
+                                          f.name.toLowerCase() === item.productName.toLowerCase()
+                                      ) || ({ name: item.productName, image: '🍎' } as Fruit);
+                                    return (
+                                      <div className="flex items-center gap-2">
+                                        <FruitAvatar fruit={matchedFruit} size="xs" shape="square" />
+                                        <span>{item.productName}</span>
+                                      </div>
+                                    );
+                                  })()}
+                                </td>
                                 <td className="p-2.5 text-center font-bold text-slate-800 font-mono">
                                   {item.quantity}
                                 </td>
@@ -1408,6 +1631,25 @@ export const SalesView: React.FC<SalesViewProps> = ({
           </div>
         </div>
       )}
+
+      {/* Quick Add Company Profile Modal (Part A) */}
+      <CompanyBillProfileModal
+        isOpen={isAddCompanyModalOpen}
+        onClose={() => setIsAddCompanyModalOpen(false)}
+        onSaved={(newProfile) => {
+          setSelectedCompanyProfileId(newProfile.id);
+        }}
+        onRefreshData={onRefreshData}
+      />
+
+      {/* Quick Add Fruit Modal right inside Bill creation (Part F) */}
+      <QuickAddFruitModal
+        isOpen={isQuickAddFruitModalOpen}
+        onClose={() => setIsQuickAddFruitModalOpen(false)}
+        prefilledName={productSearchTerm}
+        onFruitCreated={handleFruitCreated}
+        onRefreshData={onRefreshData}
+      />
     </div>
   );
 };

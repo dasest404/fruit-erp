@@ -368,6 +368,27 @@ export const api = {
       body: JSON.stringify(payload),
     }),
 
+  // Company Profiles
+  getCompanyProfiles: () =>
+    request<{ success: boolean; companyProfiles: any[] }>('/api/erp/company-profiles'),
+
+  createCompanyProfile: (payload: any) =>
+    request<{ success: boolean; companyProfile: any }>('/api/erp/company-profiles', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  updateCompanyProfile: (id: string, payload: any) =>
+    request<{ success: boolean; companyProfile: any }>(`/api/erp/company-profiles/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+
+  deleteCompanyProfile: (id: string) =>
+    request<{ success: boolean }>(`/api/erp/company-profiles/${id}`, {
+      method: 'DELETE',
+    }),
+
   // Backup & Reset
   getBackupUrl: () => '/api/erp/backup',
   exportBackup: () => request<any>('/api/erp/backup'),

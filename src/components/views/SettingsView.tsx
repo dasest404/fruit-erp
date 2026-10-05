@@ -18,10 +18,19 @@ import {
   RefreshCw,
   Archive,
   Laptop,
+  Plus,
+  Edit2,
+  Trash2,
+  Star,
+  Check,
+  Phone,
+  Mail,
+  CreditCard,
 } from 'lucide-react';
-import { ERPDataStore, BusinessSettings } from '../../types';
+import { ERPDataStore, BusinessSettings, CompanyBillProfile } from '../../types';
 import { api } from '../../services/api';
 import { DEFAULT_COMPANY_PROFILE } from '../../config/companyProfile';
+import { CompanyBillProfileModal } from '../CompanyBillProfileModal';
 
 interface SettingsViewProps {
   data: ERPDataStore;
@@ -57,6 +66,40 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Active Settings Tab & Company Profile States
+  const [activeTab, setActiveTab] = useState<'companies' | 'general' | 'storage'>('companies');
+  const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
+  const [editingCompany, setEditingCompany] = useState<CompanyBillProfile | null>(null);
+
+  const handleSetDefaultCompany = async (profileId: string) => {
+    try {
+      await api.updateCompanyProfile(profileId, { isDefault: true });
+      await onRefreshData();
+      setSaveMessage('Default company profile updated successfully.');
+      setTimeout(() => setSaveMessage(''), 3000);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to update default company profile.');
+    }
+  };
+
+  const handleDeleteCompany = async (profile: CompanyBillProfile) => {
+    if (
+      !window.confirm(
+        `Are you sure you want to delete / deactivate "${profile.companyName}"?\nIf linked to historical bills, it will be safely deactivated.`
+      )
+    ) {
+      return;
+    }
+    try {
+      await api.deleteCompanyProfile(profile.id);
+      await onRefreshData();
+      setSaveMessage('Company profile removed / deactivated safely.');
+      setTimeout(() => setSaveMessage(''), 3000);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to delete company profile.');
+    }
+  };
 
   // Local Storage & Backup States
   const [storageInfo, setStorageInfo] = useState<{
@@ -290,8 +333,220 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
       )}
 
-      {/* Local SQLite Database & Desktop Architecture Card */}
-      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-4">
+      {/* Settings Navigation Tabs */}
+      <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto">
+        <button
+          type="button"
+          onClick={() => setActiveTab('companies')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+            activeTab === 'companies'
+              ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/25'
+              : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200/80 hover:bg-slate-50'
+          }`}
+        >
+          <Building className="w-4 h-4" />
+          <span>Company Bill Profiles ({data.companyProfiles?.length || 1})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('general')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+            activeTab === 'general'
+              ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/25'
+              : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200/80 hover:bg-slate-50'
+          }`}
+        >
+          <Settings className="w-4 h-4" />
+          <span>General APMC Settings</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('storage')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+            activeTab === 'storage'
+              ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/25'
+              : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200/80 hover:bg-slate-50'
+          }`}
+        >
+          <Database className="w-4 h-4" />
+          <span>SQLite Database &amp; Backups</span>
+        </button>
+      </div>
+
+      {/* TAB 1: COMPANY BILL PROFILES (PART 1) */}
+      {activeTab === 'companies' && (
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs">
+            <div>
+              <h3 className="font-extrabold text-base text-slate-900 font-heading">
+                Company Bill Profiles
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Support multiple billing entities. When creating a bill, select which company profile is used — that company will be the exclusive entity printed on the bill and preserved historically.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setEditingCompany(null);
+                setIsCompanyModalOpen(true);
+              }}
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-bold transition-all shadow-sm shadow-emerald-600/25 cursor-pointer shrink-0"
+            >
+              <Plus className="w-4 h-4" />
+              <span>+ Add Company Profile</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {(data.companyProfiles && data.companyProfiles.length > 0
+              ? data.companyProfiles
+              : [
+                  {
+                    id: 'comp-1',
+                    companyName: data.settings?.businessName || 'Hari Kripa Fruit Company',
+                    tradeName: data.settings?.shortName || 'HFC',
+                    logo: data.settings?.logoUrl || '/assets/hfc-logo.svg',
+                    address:
+                      data.settings?.address ||
+                      'Shop- A/6 Wholesale Fruit Market Camp-2, Power House, Bhilai (C.G.)',
+                    phone: data.settings?.phone1 || data.settings?.phone || '+91 7566996333',
+                    email: data.settings?.email || 'harikripafruitco@gmail.com',
+                    gstin: data.settings?.gstNumber || data.settings?.gstin || '',
+                    bankDetails: data.settings?.bankDetails || '',
+                    upi: data.settings?.upiId || '',
+                    termsConditions: data.settings?.invoiceTerms || '',
+                    isDefault: true,
+                    isActive: true,
+                  },
+                ]
+            ).map((cp) => (
+              <div
+                key={cp.id}
+                className={`bg-white rounded-3xl border p-5 space-y-4 transition-all shadow-xs relative ${
+                  cp.isDefault
+                    ? 'border-emerald-300 ring-2 ring-emerald-500/20'
+                    : cp.isActive === false
+                    ? 'border-slate-200 opacity-60 bg-slate-50/50'
+                    : 'border-slate-200/80'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-2xs">
+                      {cp.logo ? (
+                        <img src={cp.logo} alt={cp.companyName} className="w-full h-full object-contain p-1" />
+                      ) : (
+                        <span className="font-black text-emerald-700 text-lg">{cp.companyName.charAt(0)}</span>
+                      )}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="font-extrabold text-sm text-slate-900 font-heading">
+                          {cp.companyName}
+                        </h4>
+                        {cp.isDefault && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">
+                            <Star className="w-2.5 h-2.5 fill-emerald-600 text-emerald-600" />
+                            <span>Default</span>
+                          </span>
+                        )}
+                        {cp.isActive === false && (
+                          <span className="px-2 py-0.5 rounded-full bg-slate-200 text-slate-600 text-[10px] font-bold">
+                            Inactive
+                          </span>
+                        )}
+                      </div>
+                      {cp.tradeName && cp.tradeName !== cp.companyName && (
+                        <p className="text-xs text-emerald-700 font-semibold">{cp.tradeName}</p>
+                      )}
+                      <p className="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                        📍 {cp.address}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-[11px]">
+                  <div>
+                    <span className="text-slate-400 font-medium block">Phone:</span>
+                    <span className="font-bold text-slate-800">{cp.phone}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-medium block">GSTIN / PAN:</span>
+                    <span className="font-mono font-bold text-slate-800">
+                      {cp.gstin || cp.pan || 'N/A'}
+                    </span>
+                  </div>
+                  {cp.email && (
+                    <div className="col-span-2 truncate">
+                      <span className="text-slate-400 font-medium">Email: </span>
+                      <span className="text-slate-700">{cp.email}</span>
+                    </div>
+                  )}
+                  {cp.bankDetails && (
+                    <div className="col-span-2 truncate">
+                      <span className="text-slate-400 font-medium">Bank: </span>
+                      <span className="font-mono text-slate-700">{cp.bankDetails}</span>
+                    </div>
+                  )}
+                  {cp.upi && (
+                    <div className="col-span-2 truncate">
+                      <span className="text-slate-400 font-medium">UPI: </span>
+                      <span className="text-emerald-700 font-bold">{cp.upi}</span>
+                    </div>
+                  )}
+                  {cp.authorizedPerson && (
+                    <div className="col-span-2 truncate">
+                      <span className="text-slate-400 font-medium">Signatory: </span>
+                      <span className="font-semibold text-slate-800">{cp.authorizedPerson}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                  {!cp.isDefault && (
+                    <button
+                      type="button"
+                      onClick={() => handleSetDefaultCompany(cp.id)}
+                      className="text-xs font-bold text-emerald-600 hover:text-emerald-700 cursor-pointer"
+                    >
+                      ★ Set as Default
+                    </button>
+                  )}
+                  <div className="flex items-center gap-1.5 ml-auto">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingCompany(cp);
+                        setIsCompanyModalOpen(true);
+                      }}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                      <span>Edit</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteCompany(cp)}
+                      className="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-100 text-slate-500 hover:text-rose-600 text-xs transition-colors cursor-pointer"
+                      title="Deactivate / Delete Profile"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: Local SQLite Database & Desktop Architecture Card */}
+      {activeTab === 'storage' && (
+        <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
           <h3 className="font-extrabold text-sm text-slate-900 font-heading flex items-center gap-2">
             <Laptop className="w-4 h-4 text-emerald-600" />
@@ -421,7 +676,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </div>
         )}
       </div>
+      )}
 
+      {/* TAB 2: GENERAL APMC MANDI PROFILE */}
+      {activeTab === 'general' && (
       <form onSubmit={handleSaveSettings} className="space-y-6">
         {/* Company Profile / Business Profile Branding Card */}
         <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-5">
@@ -724,8 +982,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </div>
         </div>
       </form>
+      )}
 
-      {/* JSON File Export / Import */}
+      {/* TAB 3: Portable JSON File Export / Import */}
+      {activeTab === 'storage' && (
       <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-4">
         <h3 className="font-extrabold text-sm text-slate-900 font-heading border-b border-slate-100 pb-3 flex items-center gap-2">
           <Shield className="w-4 h-4 text-emerald-600" />
@@ -767,6 +1027,23 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </button>
         </div>
       </div>
+      )}
+
+      {/* Company Bill Profile Add/Edit Modal (Part 1) */}
+      <CompanyBillProfileModal
+        isOpen={isCompanyModalOpen}
+        onClose={() => {
+          setIsCompanyModalOpen(false);
+          setEditingCompany(null);
+        }}
+        profile={editingCompany}
+        onSaved={async () => {
+          await onRefreshData();
+          setSaveMessage('Company profile saved successfully.');
+          setTimeout(() => setSaveMessage(''), 3000);
+        }}
+        onRefreshData={onRefreshData}
+      />
     </div>
   );
 };
